@@ -3,6 +3,10 @@
     padding: 35px 0;
 }
 
+.tweet-feed {
+  padding-top: 10px;
+}
+
 .container {
     width: 917px;
 }
