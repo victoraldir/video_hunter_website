@@ -55,6 +55,7 @@ function addVideo(video) {
 }
 
 function downloadVideo(videoUrl) {
+    enableLoading();
     let oReq = new XMLHttpRequest();
     oReq.responseType = 'blob';
     oReq.onload = function(e) {
@@ -71,9 +72,11 @@ function saveBlob(blob, fileName) {
     a.href = window.URL.createObjectURL(blob);
     a.download = fileName;
     a.dispatchEvent(new MouseEvent('click'));
+    disableLoading();
 }
 
 function loadVideos() {
+    disableLoading();
     let videoList = JSON.parse(this.responseText);
     videoList.Items.forEach(function(video) {
         addVideo(video);
@@ -96,6 +99,20 @@ function filterByContentType(variants, contentType) {
     return greatest
 }
 
+function enableLoading(){
+    let loading = document.createElement('div');
+    loading.classList.add('loading')
+    loading.id = 'loading'
+
+    var feed = document.getElementById('feed');
+    feed.appendChild(loading);
+}
+
+function disableLoading(){
+    let loading = document.getElementById('loading');
+    loading.remove()
+}
+
 function replaceImgToVideo(id, videoUrl) {
 
     var element = document.getElementById(id);
@@ -114,6 +131,7 @@ function replaceImgToVideo(id, videoUrl) {
 }
 
 function fetchVideos() {
+    enableLoading()
     let oReq = new XMLHttpRequest();
     oReq.onload = loadVideos;
     oReq.open("get", "https://api.myvideohunter.com/requester/" + params.u + "/list", true);
