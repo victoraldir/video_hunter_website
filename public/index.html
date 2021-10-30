@@ -1,89 +1,92 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+<html lang="en">
+   <head>
+      <script type='text/javascript'>
+         if (window.location.search.includes('?u=')){
+            location.replace('videos.html' + window.location.search);
+         }
+      </script>
+      <title>Video Hunter - Video downloader</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-MBT9KLR914"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/9.2.0/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/9.2.0/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/9.2.0/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/9.2.0/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/9.2.0/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/9.2.0/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/9.2.0/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/9.2.0/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/9.2.0/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/9.2.0/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
-
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
-    </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
-
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
-        }
-      });
-    </script>
-  </body>
+        gtag('config', 'G-MBT9KLR914');
+      </script>
+   </head>
+   <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+         <div class="container-fluid">
+            <a class="navbar-brand" href="#">Video Hunter</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                     <a class="nav-link active" aria-current="page" href="#">Home</a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="/#how-to">How To</a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="/faq.html">FAQ</a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="/policy.html">Privacy Policy</a>
+                  </li>
+               </ul>
+               <form action="videos.html?" class="d-flex">
+                  <input name="u" class="form-control me-2" type="search" placeholder="@TwitterUser" aria-label="Search">
+                  <button class="btn btn-outline-success" type="submit">Search</button>
+               </form>
+            </div>
+         </div>
+      </nav>
+      <div class="container-fluid p-4 bg-primary text-white text-center">
+         <h1>Video Hunter</h1>
+         <p>Your favorite video downloader</p>
+      </div>
+      <div class="container-fluid">
+         <div class="row">
+            <div class="col-lg-12 col-md-12 card">
+               <div style="margin:15px 15px 15px 15px;">
+                  <div class="wrap-txt" id="about">
+                     <h3>
+                        <strong>About Us</strong>
+                     </h3>
+                     <p><a href="https://twitter.com/BaixadorDeVideo">@BaixadorDeVideo</a> is a Twitter bot made to help you download videos &amp; gifs from twitter.</p>
+                     <p>Mention <a href="https://twitter.com/BaixadorDeVideo">@BaixadorDeVideo</a> in a reply to any tweet with a video or gif, and you will get a response in few seconds.</p>
+                  </div>
+                  <div class="wrap-txt" id="how-to">
+                     <h3>
+                        <strong>How to Download Twitter Videos?</strong>
+                     </h3>
+                     <p>You can download videos from Twitter by mentioning <a href="https://twitter.com/BaixadorDeVideo">@BaixadorDeVideo</a> ina reply to a video or gif tweet.</p>
+                     <p>If you'd like to use our <a href="https://play.google.com/store/apps/details?id=com.myvideohunter.video_hunter_app&hl=pt_BR&gl=US">android app</a> directly, these are the steps to download videos from Twitter:</p>
+                     <ul class="list-group">
+                        <li class="list-group-item" style="border:none">1. Find the Tweet that has the video you want download.</li>
+                        <li class="list-group-item" style="border:none">2. Tap the share icon and select the App Video Hunter.</li>
+                        <li class="list-group-item" style="border:none">3. Done. The video will be available in your account.</li>
+                     </ul>
+                     <p>With BaixadorDeVideo, you can download Twitter videos &amp; gifs to your iPhone/iOS, Android, smartphones &amp; desktop computer devices.</p>
+                     <h3> 
+                        <strong>Video Hunter App</strong>
+                     </h3>
+                     <p>
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/halFJMgV8_4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                     </p>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </body>
 </html>
