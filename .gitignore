@@ -45,6 +45,10 @@
 #
 # -----------------------------------------------------------------
 
+# Ignore DS_Store
+
+.DS_STORE
+
 # ignore all files starting with . or ~
 .*
 ~*
