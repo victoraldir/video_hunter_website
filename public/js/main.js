@@ -88,10 +88,13 @@ function filterByContentType(variants, contentType) {
         return variant.content_type === contentType;
     })
 
-    let greatest = 0
+    let greatest
 
     mp4List.forEach(function(variant) {
-        if (variant.bitrate > greatest) {
+        if (!greatest){
+            greatest = variant
+        }
+        if (variant.bitrate > greatest.bitrate) {
             greatest = variant
         }
     })
