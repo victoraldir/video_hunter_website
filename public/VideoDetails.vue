@@ -62,7 +62,7 @@ export default {
     },
     computed: {
         getHref() {
-            return "http://127.0.0.1:5173/videos.html?u=" + this.user
+            return "https://myvideohunter.com/videos.html?u=" + this.user
         }
     },
     created() {

@@ -64,7 +64,7 @@ export default {
                 return "#"
             }
 
-            return "http://127.0.0.1:5173/video.html?u=" + this.user + "&createdAt=" + this.createdAt
+            return "https://myvideohunter.com/video.html?u=" + this.user + "&createdAt=" + this.createdAt
         },
         getHigherBitrate() {
             if(this.variants) {
