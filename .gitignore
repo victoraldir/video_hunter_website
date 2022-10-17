@@ -111,3 +111,6 @@ Thumbs.db
 !.editorconfig
 !.phpcs.xml.dist
 !.env.example
+
+dist
+public/dist
