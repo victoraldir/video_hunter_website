@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <script type='text/javascript'>
+         if (window.location.search.includes('?u=')){
+            location.replace('videos.html' + window.location.search);
+         }
+      </script>
+      <title>Video Hunter - Video downloader</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="Download videos from Twitter by mentioning @BaixadorDeVideo. You can also use our app Video Hunter to download videos">
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+      <link rel="apple-touch-icon" sizes="57x57" href="/assets/apple-icon-57x57.42aa75f4.png">
+      <link rel="apple-touch-icon" sizes="60x60" href="/assets/apple-icon-60x60.234bf0eb.png">
+      <link rel="apple-touch-icon" sizes="72x72" href="/assets/apple-icon-72x72.80cfccbc.png">
+      <link rel="apple-touch-icon" sizes="76x76" href="/assets/apple-icon-76x76.ef9c5eaa.png">
+      <link rel="apple-touch-icon" sizes="114x114" href="/assets/apple-icon-114x114.5da41168.png">
+      <link rel="apple-touch-icon" sizes="120x120" href="/assets/apple-icon-120x120.567c9aca.png">
+      <link rel="apple-touch-icon" sizes="144x144" href="/assets/apple-icon-144x144.517605bd.png">
+      <link rel="apple-touch-icon" sizes="152x152" href="/assets/apple-icon-152x152.a9315e05.png">
+      <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-icon-180x180.f5dab1a8.png">
+      <link rel="icon" type="image/png" sizes="192x192"  href="/assets/android-icon-192x192.2b6e4522.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,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">
+      <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96x96.9ea6aa34.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="data:image/png;base64,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">
+      <link rel="manifest" href="data:application/json;base64,ewogIm5hbWUiOiAiQXBwIiwKICJpY29ucyI6IFsKICB7CiAgICJzcmMiOiAiXC9hbmRyb2lkLWljb24tMzZ4MzYucG5nIiwKICAgInNpemVzIjogIjM2eDM2IiwKICAgInR5cGUiOiAiaW1hZ2VcL3BuZyIsCiAgICJkZW5zaXR5IjogIjAuNzUiCiAgfSwKICB7CiAgICJzcmMiOiAiXC9hbmRyb2lkLWljb24tNDh4NDgucG5nIiwKICAgInNpemVzIjogIjQ4eDQ4IiwKICAgInR5cGUiOiAiaW1hZ2VcL3BuZyIsCiAgICJkZW5zaXR5IjogIjEuMCIKICB9LAogIHsKICAgInNyYyI6ICJcL2FuZHJvaWQtaWNvbi03Mng3Mi5wbmciLAogICAic2l6ZXMiOiAiNzJ4NzIiLAogICAidHlwZSI6ICJpbWFnZVwvcG5nIiwKICAgImRlbnNpdHkiOiAiMS41IgogIH0sCiAgewogICAic3JjIjogIlwvYW5kcm9pZC1pY29uLTk2eDk2LnBuZyIsCiAgICJzaXplcyI6ICI5Nng5NiIsCiAgICJ0eXBlIjogImltYWdlXC9wbmciLAogICAiZGVuc2l0eSI6ICIyLjAiCiAgfSwKICB7CiAgICJzcmMiOiAiXC9hbmRyb2lkLWljb24tMTQ0eDE0NC5wbmciLAogICAic2l6ZXMiOiAiMTQ0eDE0NCIsCiAgICJ0eXBlIjogImltYWdlXC9wbmciLAogICAiZGVuc2l0eSI6ICIzLjAiCiAgfSwKICB7CiAgICJzcmMiOiAiXC9hbmRyb2lkLWljb24tMTkyeDE5Mi5wbmciLAogICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICJ0eXBlIjogImltYWdlXC9wbmciLAogICAiZGVuc2l0eSI6ICI0LjAiCiAgfQogXQp9">
+      <!-- Twitter card stuff -->
+      <meta name="twitter:card" content="Summary">
+      <meta name="twitter:creator" content="@BaixadorDeVideo">
+      <meta name="twitter:site" content="@BaixadorDeVideo">
+      <meta name="twitter:domain" content="myvideohunter.com">
+      <meta name="twitter:title" content="Download videos by tagging @BaixadorDeVideo">
+      <meta name="twitter:description" content="Download videos from Twitter just by tagging @BaixadorDeVideo. It's simple, quick and safe">
+      <meta property="og:image" content="images/apple-icon-76x76.png">
+      <meta name="msapplication-TileColor" content="#ffffff">
+      <meta name="msapplication-TileImage" content="https://myvideohunter.com/images/apple-icon-76x76.png">
+      <meta name="theme-color" content="#ffffff">
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-MBT9KLR914"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-MBT9KLR914');
+        // Disable Google Analytics
+         gtag('config', 'G-MBT9KLR914', {'send_page_view': false});
+      </script>
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6526073251385305"
+     crossorigin="anonymous"></script>
+   </head>
+   <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+         <div class="container-fluid">
+            <a class="navbar-brand" href="#">Video Hunter</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                     <a class="nav-link active" aria-current="page" href="#">Home</a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="/#how-to">How To</a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="/faq.html">FAQ</a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="/policy.html">Privacy Policy</a>
+                  </li>
+               </ul>
+               <form action="videos.html?" class="d-flex">
+                  <input name="u" class="form-control me-2" type="search" placeholder="@TwitterUser" aria-label="Search">
+                  <button class="btn btn-outline-success" type="submit">Search</button>
+               </form>
+            </div>
+         </div>
+      </nav>
+      <div class="container-fluid p-4 bg-primary text-white text-center">
+         <h1>Video Hunter</h1>
+         <p>Your favorite video downloader</p>
+         <form action="videos.html?" class="d-flex">
+            <input name="u" class="form-control me-2" type="search" placeholder="@TwitterUser" aria-label="Search">
+            <button class="btn  btn-danger" type="submit">Search</button>
+         </form>
+      </div>
+      <div class="container-fluid">
+         <div class="row">
+            <div class="col-lg-12 col-md-12 card">
+               <div style="margin:15px 15px 15px 15px;">
+                  <div class="wrap-txt" id="about">
+                     <h3>
+                        <strong>About Us</strong>
+                     </h3>
+                     <p><a href="https://twitter.com/BaixadorDeVideo">@BaixadorDeVideo</a> is a Twitter bot made to help you download videos &amp; gifs from twitter.</p>
+                     <p>Mention <a href="https://twitter.com/BaixadorDeVideo">@BaixadorDeVideo</a> in a reply to any tweet with a video or gif, and you will get a response in few seconds.</p>
+                  </div>
+                  <div class="wrap-txt" id="how-to">
+                     <h3>
+                        <strong>How to Download Twitter Videos?</strong>
+                     </h3>
+                     <p>You can download videos from Twitter by mentioning <a href="https://twitter.com/BaixadorDeVideo">@BaixadorDeVideo</a> ina reply to a video or gif tweet.</p>
+                     <p>If you'd like to use our <a href="https://play.google.com/store/apps/details?id=com.myvideohunter.video_hunter_app&hl=pt_BR&gl=US">android app</a> directly, these are the steps to download videos from Twitter:</p>
+                     <ul class="list-group">
+                        <li class="list-group-item" style="border:none">1. Find the Tweet that has the video you want download.</li>
+                        <li class="list-group-item" style="border:none">2. Tap the share icon and select the App Video Hunter.</li>
+                        <li class="list-group-item" style="border:none">3. Done. The video will be available in your account.</li>
+                     </ul>
+                     <p>With BaixadorDeVideo, you can download Twitter videos &amp; gifs to your iPhone/iOS, Android, smartphones &amp; desktop computer devices.</p>
+                     <h3> 
+                        <strong>Video Hunter App</strong>
+                     </h3>
+                     <p>
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/halFJMgV8_4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                     </p>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </body>
+</html>
