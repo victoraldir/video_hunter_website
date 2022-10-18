@@ -7,15 +7,19 @@
     "vue": "^3.2.41"
   },
   "name": "html_website",
+  "type": "module",
   "version": "1.0.0",
   "description": "Video Hunter Website",
   "main": "index.js",
   "devDependencies": {
-    "vite": "^3.1.8"
+    "@vueuse/head": "^0.9.8",
+    "vite": "^3.1.8",
+    "vite-ssg": "^0.21.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "echo \"Dummy build\" && exit 0"
+    "dev": "vite public",
+    "build": "vite build --config vite.config.js",
+    "preview": "vite preview"
   },
   "repository": {
     "type": "git",
