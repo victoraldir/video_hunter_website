@@ -1,4 +1,5 @@
 <template>
+    <meta property="og:image" v-bind:content="video.video_img" />
     <spinner v-show="isLoading" />
     <!-- Video details -->
     <div v-if="!isLoading" class="card">
@@ -33,7 +34,9 @@
 
                 </table>
             </div>
-
+            <div class="col mb-3" >
+                <div class="sharethis-inline-share-buttons"></div>
+            </div>
         </div>
     </div>
 </template>
