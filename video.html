@@ -17,6 +17,13 @@
         gtag('js', new Date());
 
         gtag('config', 'G-MBT9KLR914');
+        // Send pageview on every route change
+        window.addEventListener('page:change', function() {
+            gtag('config', 'G-MBT9KLR914', {
+               'page_title': document.title,
+               'page_path': location.pathname
+            });
+         });
     </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6526073251385305"
         crossorigin="anonymous"></script>
