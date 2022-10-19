@@ -62,7 +62,7 @@ export default {
     },
     computed: {
         getHref() {
-            return "https://myvideohunter.com/videos.html?u=" + this.user
+            return "/videos.html?u=" + this.user
         }
     },
     created() {
@@ -86,13 +86,20 @@ export default {
             oReq.responseType = 'blob';
             oReq.onload = function (e) {
                 var blob = e.currentTarget.response;
-                var fileName = 'video.mp4'
-                saveBlob(blob, fileName);
+                var fileName = 'video.mp4';
+                let a = document.createElement('a');
+                a.href = window.URL.createObjectURL(blob);
+                a.download = fileName;
+                a.dispatchEvent(new MouseEvent('click'));
             };
             oReq.open("get", videoUrl, true);
             oReq.send();
-            this.isLoading = false
-        }
+            oReq.onreadystatechange = () => {
+                if (oReq.readyState === 4) {
+                    this.isLoading = false
+                }
+            }
+        },
     },
 }
 </script>

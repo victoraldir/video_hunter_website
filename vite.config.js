@@ -1,19 +1,31 @@
+import { fileURLToPath, URL } from 'node:url'
+
+import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 
-export default {
+const outDir = resolve(__dirname, 'dist')
+
+// https://vitejs.dev/config/
+export default defineConfig({
   plugins: [vue()],
-  base : './',
   build: {
+    outDir,
+    emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'public/index.html'),
-        videos: resolve(__dirname, 'public/videos.html'),
-        video: resolve(__dirname, 'public/video.html'),
-        policy: resolve(__dirname, 'public/policy.html'),
-        faq: resolve(__dirname, 'public/faq.html'),
-        error: resolve(__dirname, 'public/404.html'),
+        main: resolve(__dirname, 'index.html'),
+        videos: resolve(__dirname, 'videos.html'),
+        video: resolve(__dirname, 'video.html'),
+        policy: resolve(__dirname, 'policy.html'),
+        faq: resolve(__dirname, 'faq.html'),
+        error: resolve(__dirname, '404.html'),
       },
     },
   },
-}
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
+  }
+})

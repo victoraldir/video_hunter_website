@@ -1,34 +1,16 @@
 {
-  "dependencies": {
-    "@vitejs/plugin-vue": "^3.1.2",
-    "@vue/compiler-sfc": "^3.2.41",
-    "uglify-js": "^3.14.2",
-    "uglifycss": "^0.0.29",
-    "vue": "^3.2.41"
-  },
-  "name": "html_website",
-  "type": "module",
-  "version": "1.0.0",
-  "description": "Video Hunter Website",
-  "main": "index.js",
-  "devDependencies": {
-    "@vueuse/head": "^0.9.8",
-    "vite": "^3.1.8",
-    "vite-ssg": "^0.21.1"
-  },
+  "name": "vue-project",
+  "version": "0.0.0",
   "scripts": {
-    "dev": "vite public",
-    "build": "vite build --config vite.config.js",
-    "preview": "vite preview"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/victoraldir/video_hunter_website.git"
+  "dependencies": {
+    "vue": "^3.2.38"
   },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/victoraldir/video_hunter_website/issues"
-  },
-  "homepage": "https://github.com/victoraldir/video_hunter_website#readme"
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^3.0.3",
+    "vite": "^3.0.9"
+  }
 }

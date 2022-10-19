@@ -64,7 +64,7 @@ export default {
                 return "#"
             }
 
-            return "https://myvideohunter.com/video.html?u=" + this.user + "&createdAt=" + this.createdAt
+            return "/video.html?u=" + this.user + "&createdAt=" + this.createdAt
         },
         getHigherBitrate() {
             if(this.variants) {
