@@ -3,16 +3,20 @@
     <spinner v-show="isLoading" />
     <!-- Video details -->
     <div v-if="!isLoading" class="card">
-        <a v-bind:href="getHref">
-            Back to {{user}} videos
-        </a>
-        <hr />
-        <div class="row row-cols-1 row-cols-md-2 text-center">
-            <div class="col mb-3">
+        
+        <div class="row">
+            <div class="col-sm-12" >
+                <a v-bind:href="getHref">
+                    Back to {{user}} videos
+                </a>
+                <hr />
+            </div>
+            <div class="row">
+            <div class="col-sm-6">
                 <video-card v-if="video" v-bind:created-at="video.created_at" v-bind:variants="video.variants"
                     v-bind:user="user" />
             </div>
-            <div class="col mb-3">
+            <div class="col-sm-6">
                 <table class="table">
                     <thead>
                         <tr>
@@ -34,7 +38,8 @@
 
                 </table>
             </div>
-            <div class="col mb-3" >
+        </div>
+            <div class="col" >
                 <div class="sharethis-inline-share-buttons"></div>
             </div>
         </div>

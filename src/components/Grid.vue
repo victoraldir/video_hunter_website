@@ -1,6 +1,6 @@
 <template>
     <div class="bd-example">
-        <div class="row row-cols-1 row-cols-md-3">
+        <div class="row row-cols-1 row-cols-md-4">
             <div
                 v-for="video in videoList" 
                 class="col mb-3"
