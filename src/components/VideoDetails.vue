@@ -1,5 +1,4 @@
 <template>
-    <meta property="og:image" v-bind:content="video.video_img" />
     <spinner v-show="isLoading" />
     <!-- Video details -->
     <div v-if="!isLoading" class="card">
@@ -9,7 +8,7 @@
                 <a v-bind:href="getHref">
                     Back to {{user}} videos
                 </a>
-                <hr />
+                <hr/>
             </div>
             <div class="row">
             <div class="col-sm-6">
@@ -39,7 +38,8 @@
                 </table>
             </div>
         </div>
-            <div class="col" >
+            <div class="col-sm-12" >
+                <hr/>
                 <div class="sharethis-inline-share-buttons"></div>
             </div>
         </div>
