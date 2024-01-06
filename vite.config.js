@@ -15,8 +15,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        videos: resolve(__dirname, 'videos.html'),
-        video: resolve(__dirname, 'video.html'),
         policy: resolve(__dirname, 'policy.html'),
         faq: resolve(__dirname, 'faq.html'),
         error: resolve(__dirname, '404.html'),
