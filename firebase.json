@@ -5,12 +5,12 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "/video",
-        "destination": "/video.html"
-      }
     ]
+    // "rewrites": [
+    //   {
+    //     "source": "/video",
+    //     "destination": "/video.html"
+    //   }
+    // ]
   }
 }
