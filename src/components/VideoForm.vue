@@ -19,7 +19,7 @@
 
 <script>
 
-let apiUrl = "https://otufznyvfh.execute-api.us-east-1.amazonaws.com/Prod/url"
+let apiUrl = "https://vid.myvideohunter.com/url"
 
 export default {
   data() {
