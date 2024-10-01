@@ -1,7 +1,7 @@
 <template>
   <div v-if="!loading" class="container" >
     <div class="input-group mb-3">
-      <input v-on:keyup.enter="submit" v-model="videoUrl" type="text" class="form-control" placeholder="Twitter url" aria-label="Twitter url" aria-describedby="button-addon2"/>
+      <input v-on:keyup.enter="submit" v-model="videoUrl" type="text" class="form-control" placeholder="Video URL" aria-label="Video URL" aria-describedby="button-addon2"/>
       <button class="btn btn-secondary" type="button" id="button-addon2" @click="submit">Download</button>
     </div>
 
@@ -19,7 +19,7 @@
 
 <script>
 
-let apiUrl = "https://vid.myvideohunter.com/url"
+let apiUrl = "https://myvideohunter.com/prod/url"
 
 export default {
   data() {
@@ -72,8 +72,8 @@ export default {
     validateUrl(url) {
       var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
         '(www\\.)?'+ // subdomain
-        '(twitter\\.com|reddit\\.com)'+ // domain name
-        '(\\/[\\w\\d]+)*\\/?$') // path
+        '(twitter\\.com|reddit\\.com|x\\.com|www\\.x\\.com|www\\.reddit\\.com|www\\.twitter\\.com)'+ // domain name
+        '(\\/[-a-zA-Z0-9@:%._\\+~#=]*)*\\/?$') // path
       
       return !!pattern.test(url)
 
