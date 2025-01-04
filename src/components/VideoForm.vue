@@ -1,83 +1,110 @@
 <template>
-  <div v-if="!loading" class="container" >
-    <div class="input-group mb-3">
-      <input v-on:keyup.enter="submit" v-model="videoUrl" type="text" class="form-control" placeholder="Video URL" aria-label="Video URL" aria-describedby="button-addon2"/>
-      <button class="btn btn-secondary" type="button" id="button-addon2" @click="submit">Download</button>
+  <div class="container mt-4">
+    <div v-if="!loading" class="input-group mb-3">
+      <input 
+        v-on:keyup.enter="submit" 
+        v-model="videoUrl" 
+        type="text" 
+        class="form-control" 
+        placeholder="Enter Video URL (Twitter, Reddit, Bluesky)" 
+        aria-label="Video URL" 
+        aria-describedby="button-addon"
+      />
+      <button 
+        class="btn btn-primary" 
+        type="button" 
+        id="button-addon" 
+        @click="submit"
+      >
+        Download
+      </button>
     </div>
 
-    <p v-if="error">
-      <b>Please correct the following error(s):</b>
-      <ul>
-        <li>{{ error }}</li>
-      </ul> 
-    </p>
-  </div>
-  <div v-if="loading" class="spinner-border m-5" role="status">
-    <span class="visually-hidden">Loading...</span>
+    <div v-if="error" class="alert alert-danger" role="alert">
+      <strong>Error:</strong> {{ error }}
+    </div>
+
+    <div v-if="successMessage" class="alert alert-success" role="alert">
+      {{ successMessage }}
+    </div>
+
+    <div v-if="loading" class="text-center mt-3">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Processing your request, please wait...</p>
+    </div>
   </div>
 </template>
 
 <script>
-
-let apiUrl = "https://myvideohunter.com/prod/url"
+const apiUrl = "https://myvideohunter.com/prod/url";
 
 export default {
   data() {
     return {
       videoUrl: '',
       error: '',
-      loading: false
-    }
+      loading: false,
+      successMessage: ''
+    };
   },
   methods: {
-    submit() {
-      this.$emit('submit', this.videoUrl)
-      console.info('submit', this.videoUrl)
-
-      // POST email to API
-      let data = {video_url: this.videoUrl}
-
+    async submit() {
       if (!this.validateUrl(this.videoUrl)) {
-        this.error = 'Please enter a valid Twitter, Reddit or Bsky url video'
-        return
+        this.error = 'Please enter a valid URL from Twitter, Reddit, or Bluesky.';
+        return;
       }
 
-      this.loading = true
+      this.error = '';
+      this.loading = true;
 
-        fetch(apiUrl, {
-          method: 'POST',
-          body: JSON.stringify(data),
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }).then(res => res.json())
-          .catch(error => {
-            console.error('Error:', error)
-            this.error = error
-            this.loading = false
-          })
-          .then(response => {
-            console.log('Success:', response)
-            this.$emit('submit', this.videoUrl)
+      try {
+        const response = await this.postVideoUrl(this.videoUrl);
+        if (response && response.id) {
+          this.successMessage = 'Your download will start shortly!';
+          window.location.href = `${apiUrl}/${response.id}`;
+        } else {
+          throw new Error('Invalid response from server.');
+        }
+      } catch (err) {
+        this.error = err.message || 'Something went wrong, please try again.';
+      } finally {
+        this.loading = false;
+        this.videoUrl = '';
+      }
+    },
 
-            let id = response.id
+    async postVideoUrl(videoUrl) {
+      const data = { video_url: videoUrl };
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
-            window.location.href = `${apiUrl}/${id}`
-          })
+      if (!response.ok) {
+        throw new Error('Failed to download video. Please check the URL and try again.');
+      }
 
-        this.email = ''   
-
+      return response.json();
     },
 
     validateUrl(url) {
-      var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
-        '(www\\.)?'+ // subdomain
-        '(twitter\\.com|bsky\\.app|reddit\\.com|x\\.com|www\\.x\\.com|www\\.reddit\\.com|www\\.twitter\\.com)'+ // domain name
-        '(\\/[-a-zA-Z0-9@:%._\\+~#=]*)*\\/?$') // path
-      
-      return !!pattern.test(url)
-
+      const pattern = new RegExp(
+        '^(https?:\\/\\/)?' + // protocol
+        '(www\\.)?' + // subdomain
+        '(twitter\\.com|bsky\\.app|reddit\\.com|x\\.com)' + // domain name
+        '(\\/[-a-zA-Z0-9@:%._\\+~#?&//=]*)?$' // path
+      );
+      return pattern.test(url);
     }
   }
-}
+};
 </script>
+
+<style scoped>
+/* Add any custom styles here */
+</style>

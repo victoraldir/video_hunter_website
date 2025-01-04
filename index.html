@@ -1,121 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-      <title>Video Hunter - Video downloader</title>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <meta name="description" content="Download videos from X (Twitter), Reddit and Bluesky (bsky) by mentioning @BaixadorDeVideo. You can also use our app Video Hunter to download videos">
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
-      <link rel="apple-touch-icon" sizes="57x57" href="src/assets/apple-icon-57x57.png">
-      <link rel="apple-touch-icon" sizes="60x60" href="src/assets/apple-icon-60x60.png">
-      <link rel="apple-touch-icon" sizes="72x72" href="src/assets/apple-icon-72x72.png">
-      <link rel="apple-touch-icon" sizes="76x76" href="src/assets/apple-icon-76x76.png">
-      <link rel="apple-touch-icon" sizes="114x114" href="src/assets/apple-icon-114x114.png">
-      <link rel="apple-touch-icon" sizes="120x120" href="src/assets/apple-icon-120x120.png">
-      <link rel="apple-touch-icon" sizes="144x144" href="src/assets/apple-icon-144x144.png">
-      <link rel="apple-touch-icon" sizes="152x152" href="src/assets/apple-icon-152x152.png">
-      <link rel="apple-touch-icon" sizes="180x180" href="src/assets/apple-icon-180x180.png">
-      <link rel="icon" type="image/png" sizes="192x192"  href="src/assets/android-icon-192x192.png">
-      <link rel="icon" type="image/png" sizes="32x32" href="src/assets/favicon-32x32.png">
-      <link rel="icon" type="image/png" sizes="96x96" href="src/assets/favicon-96x96.png">
-      <link rel="icon" type="image/png" sizes="16x16" href="src/assets/favicon-16x16.png">
-      <!-- Favicon -->
-      <link rel="shortcut icon" href="src/assets/favicon.ico" type="image/x-icon">
-      <link rel="manifest" href="src/assets/manifest.json">
-      <!-- Twitter card stuff -->
-      <meta name="twitter:card" content="Summary">
-      <meta name="twitter:creator" content="Video Hunter">
-      <meta name="twitter:site" content="https://myvideohunter.com">
-      <meta name="twitter:domain" content="myvideohunter.com">
-      <meta name="twitter:title" content="Download twitter videos online">
-      <meta name="twitter:description" content="Download videos from Twitter using Video Hunter">
-      <meta property="og:image" content="src/assets/apple-icon-76x76.png">
-      <meta name="msapplication-TileColor" content="#ffffff">
-      <meta name="msapplication-TileImage" content="src/assets/apple-icon-76x76.png">
-      <meta name="theme-color" content="#ffffff">
-      <!-- Global site tag (gtag.js) - Google Analytics -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-MBT9KLR914"></script>
-      <script>
+<head>
+    <title>Video Hunter - Video Downloader</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Download videos from X (Twitter), Reddit, and Bluesky (bsky) using Video Hunter or our Telegram bot.">
+    <meta name="keywords" content="Video Downloader, Twitter Video Download, Reddit Video Download, Bluesky Video Download, Telegram Video Bot">
+    <meta name="author" content="Video Hunter">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="apple-touch-icon" sizes="180x180" href="src/assets/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="src/assets/favicon-32x32.png">
+    <link rel="manifest" href="src/assets/manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@VideoHunter">
+    <meta property="og:title" content="Video Hunter - Download Videos">
+    <meta property="og:description" content="Easily download videos from X (Twitter), Reddit, and Bluesky (bsky) with Video Hunter.">
+    <meta property="og:image" content="src/assets/og-image.png">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MBT9KLR914"></script>
+    <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-
-        gtag('config', 'G-MBT9KLR914');
-        // Disable Google Analytics for this page
-         gtag('config', 'G-MBT9KLR914', {'send_page_view': false});
-      </script>
-      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6526073251385305"
-     crossorigin="anonymous"></script>
-   </head>
-   <body>
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-         <div class="container-fluid">
+        gtag('config', 'G-MBT9KLR914', {'send_page_view': false});
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
             <a class="navbar-brand" href="#">Video Hunter</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                  <li class="nav-item">
-                     <a class="nav-link active" aria-current="page" href="#">Home</a>
-                  </li>
-                  <li class="nav-item">
-                     <a class="nav-link" href="/faq.html">FAQ</a>
-                  </li>
-                  <li class="nav-item">
-                     <a class="nav-link" href="/policy.html">Privacy Policy</a>
-                  </li>
-               </ul>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/faq.html">FAQ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/policy.html">Privacy Policy</a>
+                    </li>
+                </ul>
             </div>
-         </div>
-      </nav>
-      <div class="container-fluid p-4 bg-primary text-white text-center">
-         <h1>Video Hunter</h1>
-         <p>Your favorite video downloader</p>
-         <div id="app"></div>
-      </div>
-      <section>
-         <div class="container-xxl mt-5 pb-5 border-bottom">
-            <h2>Download X (Twitter), Reddit and Bluesky (bsky) videos</h2>
-            <p><strong><em>Video Hunter</em></strong>&nbsp;is an online web app to download X (Twitter), Reddit and Bluesky (bsky) videos to your computer or mobile phone directly. X (Twitter) and Reddit videos are embedded in the tweet, so to download X (Twitter), Reddit and Bluesky (bsky) videos online, you need to copy the tweet URL/link and paste it in the above text box. 
-               Video Hunter will extract the twitter to mp4 link from the tweet and you can save twitter videos to your computer, android or iPhone.</p>
-      
-            <p>myvideohunter.com does not host any copyrighted material or support unauthorized file sharing, all the videos are saved directly from X (Twitter) and Reddit CDN.</p>
-         </div>
-      </section>
-      <section>
-         <div class="container-xxl mt-5 pb-5 border-bottom">
-            <h2>How to Download X (Twitter), Reddit and Bluesky (bsky) videos online?</h2>
-            <p>Using Video Hunter, it is now easier for you to download X (Twitter), Reddit and Bluesky (bsky) videos. Also, you do not have to worry about 'How to save videos from X (Twitter) and Reddit' because you can also save the video promptly after the video is downloaded.</p>
-      
-         <p>Below we have come up with a few simple steps. Follow these simple steps to download X (Twitter), Reddit and Bluesky (bsky) videos online.</p>
-         
-         <h4>How to download videos from X (Twitter), Reddit and Bluesky (bsky):</h4>
-         
-         <ol>
-            <li>Open&nbsp;<a href="https://twitter.com/" target="_blank">Twitter</a>, and go to the tweet which contains twitter video.</li>
-            <li>Get the link/url of the tweet which have video.
-            <ul>
-               <li><strong>Method 1:</strong>&nbsp;Click on the tweet, and copy the url from address bar of the browser.<br>
-               &nbsp;
-               <p><img class="img-fluid" src="src/assets/method-1.png"></p>
-               </li>
-               <li><strong>Method 2:</strong>&nbsp;Copy click on the three dots(...), and click on&nbsp;<strong>"Copy link"</strong>.<br>
-               &nbsp;
-               <p><img class="img-fluid" src="src/assets/method-2.png"></p>
-               <br>
-               <br>
-               Now paste de twitter link in the input field and hit "Download".<br>
-               &nbsp;
-               <p><img class="img-fluid" src="/src/assets/method-3.png"></p>
-               </li>
-            </ul>
-            </li>
-            <li>Now your link will be precessed and you will be redirected to the download page</li>
-         </ol>
-         </div>
-      </section>
-   </body>
-   <script type="module" src="/src/js/videoForm.js"></script>
+        </div>
+    </nav>
+
+    <div class="container-fluid p-4 bg-primary text-white text-center">
+        <h1>Video Hunter</h1>
+        <p>Your favorite video downloader</p>
+        <div id="app"></div>
+    </div>
+
+    <section>
+        <div class="container-xxl mt-5 pb-5 border-bottom">
+            <h2>Download Videos from X (Twitter), Reddit, and Bluesky (bsky)</h2>
+            <p><strong>Video Hunter</strong> is an online app that allows you to download videos from X (Twitter), Reddit, and Bluesky (bsky) directly to your device. Simply copy the video link and paste it into the input field above.</p>
+            <p>Note: Video Hunter does not host any copyrighted material. All videos are saved directly from the respective content delivery networks.</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="container-xxl mt-5 pb-5 border-bottom">
+            <h2>How to Download Videos?</h2>
+            <ol>
+                <li>Navigate to the video on X (Twitter), Reddit, or Bluesky (bsky).</li>
+                <li>Copy the video URL.</li>
+                <li>Paste the URL into the input field on Video Hunter and click "Download".</li>
+                <li>Your video will be processed and ready for download shortly.</li>
+            </ol>
+        </div>
+    </section>
+
+    <section>
+        <div class="container-xxl mt-5 pb-5">
+            <h2>Download via Telegram Bot</h2>
+            <p>Prefer using Telegram? Download videos easily by sending the video link to <a href="https://t.me/MyVideoHunterBot" target="_blank">MyVideoHunterBot</a> on Telegram. Follow the simple instructions to get your video.</p>
+        </div>
+    </section>
+
+    <footer class="text-center mt-5">
+        <p>&copy; 2025 Video Hunter. All rights reserved.</p>
+    </footer>
+    <script type="module" src="/src/js/videoForm.js"></script>
+</body>
 </html>
