@@ -72,7 +72,7 @@ export default {
     validateUrl(url) {
       var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
         '(www\\.)?'+ // subdomain
-        '(twitter\\.com|reddit\\.com|x\\.com|www\\.x\\.com|www\\.reddit\\.com|www\\.twitter\\.com)'+ // domain name
+        '(twitter\\.com|bsky\\.com|reddit\\.com|x\\.com|www\\.x\\.com|www\\.reddit\\.com|www\\.twitter\\.com)'+ // domain name
         '(\\/[-a-zA-Z0-9@:%._\\+~#=]*)*\\/?$') // path
       
       return !!pattern.test(url)
