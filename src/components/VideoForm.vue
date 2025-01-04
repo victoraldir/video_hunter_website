@@ -38,7 +38,7 @@ export default {
       let data = {video_url: this.videoUrl}
 
       if (!this.validateUrl(this.videoUrl)) {
-        this.error = 'Please enter a valid Twitter url'
+        this.error = 'Please enter a valid Twitter, Reddit or Bsky url video'
         return
       }
 
