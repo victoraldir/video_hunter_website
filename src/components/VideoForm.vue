@@ -72,23 +72,45 @@ export default {
       this.successMessage = '';
       this.loading = true;
 
-      try {
-        const response = await postVideoUrl(this.videoUrl);
-        if (response && response.id) {
-          this.successMessage = 'Your download will start shortly!';
-          // Delay redirect slightly to allow user to see success message
-          setTimeout(() => {
-            window.location.href = getDownloadLink(response.id);
-          }, 1500);
-        } else {
-          throw new Error('Invalid response from the server. Please try again.');
+      let attempts = 0;
+      const maxAttempts = 3;
+      const retryDelay = 1000; // 1 second
+
+      while (attempts < maxAttempts) {
+        try {
+          const response = await postVideoUrl(this.videoUrl);
+          if (response && response.id) {
+            this.successMessage = 'Your download will start shortly!';
+            // Delay redirect slightly to allow user to see success message
+            setTimeout(() => {
+              window.location.href = getDownloadLink(response.id);
+            }, 1500);
+            this.loading = false; // Ensure loading is set to false on success
+            return; // Exit the loop and method on success
+          } else {
+            // This case might indicate a non-retryable server issue or unexpected response format
+            throw new Error('Invalid response from the server. Please try again.');
+          }
+        } catch (err) {
+          attempts++;
+          let displayErrorMessage = err.message || 'Something went wrong, please try again.';
+          if (err.message === 'Failed to fetch') {
+            displayErrorMessage = 'Unable to connect to the server. Please check your internet connection and try again.';
+          }
+
+          if (attempts >= maxAttempts) {
+            this.error = displayErrorMessage;
+            this.loading = false; // Ensure loading is set to false on final failure
+            return; // Exit after final attempt
+          }
+          // Optional: Log retry attempt
+          console.log(`Attempt ${attempts} failed (${err.message}). Retrying in ${retryDelay / 1000}s...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
         }
-      } catch (err) {
-        this.error = err.message || 'Something went wrong, please try again.';
-      } finally {
-        this.loading = false;
-        // Don't clear videoUrl here, user might want to retry or copy it
       }
+      // This part should ideally not be reached if logic is correct,
+      // but as a fallback, ensure loading is false.
+      this.loading = false;
     },
 
     validateUrl(url) {
