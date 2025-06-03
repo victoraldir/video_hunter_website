@@ -55,6 +55,7 @@ export default {
   created() {
     const urlParams = new URLSearchParams(window.location.search);
     const videoUrlFromQuery = urlParams.get('url') || urlParams.get('videoUrl'); // Support both 'url' and 'videoUrl'
+    console.log('Video URL from query:', videoUrlFromQuery); // Debugging log
     if (videoUrlFromQuery) {
       this.videoUrl = videoUrlFromQuery;
       this.submit();
