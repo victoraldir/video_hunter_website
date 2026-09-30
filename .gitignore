@@ -112,5 +112,8 @@ Thumbs.db
 !.phpcs.xml.dist
 !.env.example
 
+# keep GitHub Actions workflows tracked despite the ".*" rule above
+!.github/
+
 dist
 public/dist

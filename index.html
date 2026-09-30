@@ -1,70 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Video Hunter - Easy Video Downloader for X, Twitter, Reddit, Bluesky</title>
+    <title>Video Hunter — Free Video Downloader for X (Twitter), Reddit &amp; Bluesky</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Effortlessly download videos from X (formerly Twitter), Reddit, and Bluesky (bsky) with Video Hunter. Fast, free, and easy to use online or via our Telegram bot.">
-    <meta name="keywords" content="Video Downloader, Download X Videos, Download Twitter Videos, Download Reddit Videos, Download Bluesky Videos, bsky video download, online video downloader, free video downloader, Telegram video bot, save video online">
-    <meta name="author" content="Video Hunter">
+    <meta name="description" content="Download videos from X (Twitter), Reddit and Bluesky for free. Paste a video link and save it in HD in seconds — no signup, no watermark. Also available as a Telegram bot.">
+    <link rel="canonical" href="https://www.myvideohunter.com/">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- PWA Manifest and Theme Color -->
     <link rel="manifest" href="/assets/manifest.json">
     <meta name="theme-color" content="#0d6efd">
 
-    <!-- Apple Touch Icons -->
+    <!-- Icons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-icon-180x180.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
-    <!-- ... other apple-touch-icon and favicon links if you have more sizes ... -->
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@VideoHunter">
-    <meta property="og:title" content="Video Hunter - Download Videos from X, Reddit, Bluesky">
-    <meta property="og:description" content="Quickly save videos from X (Twitter), Reddit, and Bluesky with Video Hunter. Paste the link and download instantly.">
-    <meta property="og:image" content="/assets/og-image.png">
-    <meta property="og:url" content="https://www.myvideohunter.com">
+    <meta name="twitter:title" content="Video Hunter — Free Video Downloader for X, Reddit &amp; Bluesky">
+    <meta name="twitter:description" content="Paste a video link and save it in HD in seconds. Free, no signup, no watermark.">
+    <meta name="twitter:image" content="https://www.myvideohunter.com/assets/og-image.png">
+    <meta property="og:title" content="Video Hunter — Free Video Downloader for X, Reddit &amp; Bluesky">
+    <meta property="og:description" content="Paste a video link and save it in HD in seconds. Free, no signup, no watermark.">
+    <meta property="og:image" content="https://www.myvideohunter.com/assets/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://www.myvideohunter.com/">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Video Hunter">
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-MBT9KLR914"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-        gtag('config', 'G-MBT9KLR914', {'send_page_view': false});
+        gtag('config', 'G-MBT9KLR914');
     </script>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Video Hunter",
-      "url": "https://www.myvideohunter.com", // Replace with your actual domain
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://www.myvideohunter.com/?url={search_term_string}", // Replace with your actual domain
-        "query-input": "required name=search_term_string"
-      }
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://www.myvideohunter.com/#website",
+          "url": "https://www.myvideohunter.com/",
+          "name": "Video Hunter",
+          "description": "Free online video downloader for X (Twitter), Reddit and Bluesky.",
+          "inLanguage": "en"
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://www.myvideohunter.com/#app",
+          "name": "Video Hunter",
+          "url": "https://www.myvideohunter.com/",
+          "applicationCategory": "MultimediaApplication",
+          "operatingSystem": "Any (web browser)",
+          "description": "Download videos from X (Twitter), Reddit and Bluesky. Paste a video link and save it in HD in seconds.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "featureList": [
+            "Download videos from X (Twitter)",
+            "Download videos from Reddit",
+            "Download videos from Bluesky",
+            "Download videos through a Telegram bot"
+          ],
+          "publisher": {
+            "@type": "Organization",
+            "name": "Video Hunter",
+            "url": "https://www.myvideohunter.com/"
+          }
+        }
+      ]
     }
     </script>
     <script>
         window.addEventListener('load', () => {
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-              .then(registration => {
-                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-              }, err => {
-                console.log('ServiceWorker registration failed: ', err);
-              });
-          }
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    }, err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            }
         });
-      </script>
+    </script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm"> <!-- Added sticky-top and shadow -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="#"> <!-- Added fw-bold -->
-                <img src="public/assets/favicon-32x32.png" alt="Video Hunter Logo" width="30" height="30" class="d-inline-block align-text-top me-2"> <!-- Added logo -->
+            <a class="navbar-brand fw-bold" href="/">
+                <img src="/assets/favicon-32x32.png" alt="Video Hunter Logo" width="30" height="30" class="d-inline-block align-text-top me-2">
                 Video Hunter
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +104,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                        <a class="nav-link active" aria-current="page" href="/">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/faq.html">FAQ</a>
@@ -86,32 +117,31 @@
         </div>
     </nav>
 
-    <header class="container-fluid p-md-5 p-4 bg-primary text-white text-center hero-section"> <!-- Added class for potential custom styling, adjusted padding -->
-        <h1 class="display-4 fw-bold">Video Hunter: Download Videos Instantly</h1> <!-- Made H1 more prominent -->
-        <p class="lead col-md-8 mx-auto">Easily save videos from X (Twitter), Reddit, and Bluesky. Paste, click, and download!</p> <!-- Used lead class, centered -->
-        <div id="app" class="mt-4 col-md-8 mx-auto"></div> <!-- Centered app container -->
+    <header class="container-fluid p-md-5 p-4 bg-primary text-white text-center hero-section">
+        <h1 class="display-4 fw-bold">Free Video Downloader for X (Twitter), Reddit &amp; Bluesky</h1>
+        <p class="lead col-md-8 mx-auto">Easily save videos from X (Twitter), Reddit and Bluesky. Paste the link, click download, done.</p>
+        <div id="app" class="mt-4 col-md-8 mx-auto"></div>
     </header>
 
-    <main> <!-- Added main tag for semantic structure -->
-        <section class="py-5"> <!-- Added py-5 for vertical padding -->
-            <div class="container"> <!-- Changed from container-xxl for consistency, can be adjusted -->
+    <main>
+        <section class="py-5">
+            <div class="container">
                 <div class="row align-items-center">
                     <div class="col-md-6">
-                        <h2 class="h1">Seamless Video Downloads from X, Reddit & Bluesky</h2> <!-- Made H2 larger -->
+                        <h2 class="h1">Seamless Video Downloads from X, Reddit &amp; Bluesky</h2>
                         <p class="lead">Tired of not being able to save videos from your favorite platforms? <strong>Video Hunter</strong> provides a simple and fast solution to download videos from X (formerly Twitter), Reddit, and Bluesky (bsky) directly to your computer or mobile device. Just grab the video link, paste it into our downloader, and save your video in moments.</p>
-                        <p class="text-muted small">Note: Video Hunter respects content creators. All videos are streamed directly from the respective content delivery networks. Please ensure you have the right to download the content.</p> <!-- Clarified note -->
+                        <p class="text-muted small">Note: Video Hunter respects content creators. All videos are streamed directly from the respective content delivery networks. Please ensure you have the right to download the content.</p>
                     </div>
                     <div class="col-md-6 text-center">
-                        <!-- Placeholder for an illustrative image or animation if desired -->
-                        <img src="public/assets/method-1.png" alt="Illustration of video downloading process" class="img-fluid rounded shadow-lg">
+                        <img src="/assets/method-1.png" alt="Illustration of the Video Hunter video downloading process" class="img-fluid rounded shadow-lg">
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="py-5 bg-light"> <!-- Added bg-light for visual separation -->
+        <section class="py-5 bg-light">
             <div class="container">
-                <h2 class="text-center mb-4 h1">Simple Steps to Download Your Videos</h2> <!-- Centered, margin bottom, made H2 larger -->
+                <h2 class="text-center mb-4 h1">Simple Steps to Download Your Videos</h2>
                 <div class="row text-center">
                     <div class="col-md-3">
                         <div class="p-3">
@@ -130,7 +160,7 @@
                     <div class="col-md-3">
                         <div class="p-3">
                             <span class="display-4 text-primary">3</span>
-                            <h3 class="h5 mt-2">Paste & Download</h3>
+                            <h3 class="h5 mt-2">Paste &amp; Download</h3>
                             <p>Paste the link into Video Hunter and click "Download".</p>
                         </div>
                     </div>
@@ -149,20 +179,20 @@
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-md-6 text-center">
-                         <img src="public/assets/method-2.png" alt="Telegram Bot for Video Hunter" class="img-fluid rounded shadow-lg">
+                        <img src="/assets/method-2.png" alt="Telegram bot for downloading videos with Video Hunter" class="img-fluid rounded shadow-lg">
                     </div>
                     <div class="col-md-6">
-                        <h2 class="h1">Prefer Telegram? Use Our Video Hunter Bot!</h2> <!-- Made H2 larger -->
-                        <p class="lead">For ultimate convenience, send video links directly to our <a href="https://t.me/MyVideoHunterBot" target="_blank" class="fw-bold text-decoration-none">MyVideoHunterBot</a> on Telegram. It's a quick and easy way to download videos on the go, right from your chat app.</p>
+                        <h2 class="h1">Prefer Telegram? Use Our Video Hunter Bot!</h2>
+                        <p class="lead">For ultimate convenience, send video links directly to our <a href="https://t.me/MyVideoHunterBot" target="_blank" rel="noopener" class="fw-bold text-decoration-none">MyVideoHunterBot</a> on Telegram. It's a quick and easy way to download videos on the go, right from your chat app.</p>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="text-center py-4 mt-auto bg-dark text-white"> <!-- Added py-4, mt-auto, bg-dark, text-white -->
+    <footer class="text-center py-4 mt-auto bg-dark text-white">
         <div class="container">
-            <p class="mb-0">&copy; <span id="copyYear">2024</span> Video Hunter. All rights reserved.</p> <!-- Dynamic year -->
+            <p class="mb-0">&copy; <span id="copyYear">2026</span> Video Hunter. All rights reserved.</p>
             <p class="mb-0"><a href="/policy.html" class="text-white-50">Privacy Policy</a> | <a href="/faq.html" class="text-white-50">FAQ</a></p>
         </div>
     </footer>

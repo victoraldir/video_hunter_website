@@ -1,0 +1,94 @@
+name: Deploy website
+
+# Builds the static site and publishes it to the S3 bucket that backs the
+# CloudFront distribution. Replaces the manual `npm run build` + `aws s3 sync`
+# step, and the stale Firebase Hosting workflows it used to run.
+#
+# Required repository configuration (Settings > Secrets and variables > Actions > Variables):
+#   AWS_DEPLOY_ROLE_ARN           IAM role assumed through GitHub OIDC, with
+#                                 s3:PutObject/DeleteObject/ListBucket on the site
+#                                 bucket and cloudfront:CreateInvalidation
+#   CLOUDFRONT_DISTRIBUTION_ID    distribution to invalidate after the sync
+#
+# Until AWS_DEPLOY_ROLE_ARN is set the deploy job is skipped, so pushes stay green.
+
+on:
+  pull_request: {}
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - '*.html'
+      - 'vite.config.js'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-website
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: us-east-1
+  SITE_BUCKET: videohunter-api-website-bucket
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  deploy:
+    name: Deploy to S3 + CloudFront
+    needs: build
+    if: ${{ github.event_name != 'pull_request' && vars.AWS_DEPLOY_ROLE_ARN != '' }}
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Download build output
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Sync site to S3
+        run: |
+          aws s3 sync dist/ "s3://${SITE_BUCKET}/" --delete \
+            --cache-control "public, max-age=3600"
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --paths "/*"

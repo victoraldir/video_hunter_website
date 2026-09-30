@@ -1,2 +1,8 @@
-User-Agent: *
+User-agent: *
 Allow: /
+
+# Video pages are generated on demand and contain a single video each.
+# They are intentionally crawlable so shared links resolve in search and chat previews.
+Allow: /prod/url/
+
+Sitemap: https://www.myvideohunter.com/sitemap.xml
