@@ -1,8 +1,10 @@
-const CACHE_NAME = 'video-hunter-cache-v3';
+const CACHE_NAME = 'video-hunter-cache-v4';
 const CDN = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist';
 
 const urlsToCache = [
   '/assets/apple-icon-180x180.png',
+  '/assets/android-icon-512x512.png',
+  '/assets/maskable-icon-512x512.png',
   '/assets/favicon-32x32.png',
   '/assets/manifest.json',
   '/assets/og-image.png',
