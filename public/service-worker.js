@@ -1,73 +1,89 @@
-const CACHE_NAME = 'video-hunter-cache-v2';
+const CACHE_NAME = 'video-hunter-cache-v3';
+const CDN = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist';
+
 const urlsToCache = [
   '/assets/apple-icon-180x180.png',
   '/assets/favicon-32x32.png',
   '/assets/manifest.json',
   '/assets/og-image.png',
-  'https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css',
-  'https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js'
+  `${CDN}/css/bootstrap.min.css`,
+  `${CDN}/js/bootstrap.bundle.min.js`,
 ];
 
-self.addEventListener('install', event => {
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => Promise.all(
-        urlsToCache.map(url =>
-          cache.add(url).catch(error => {
-            // A single failing asset must not block the install.
-            console.error(`Failed to cache ${url}:`, error);
-          })
-        )
-      ))
-      .then(() => self.skipWaiting())
+    caches
+      .open(CACHE_NAME)
+      .then((cache) =>
+        Promise.all(
+          urlsToCache.map((url) =>
+            cache.add(url).catch((error) => {
+              // One failing asset must not block the install.
+              console.error(`Failed to cache ${url}:`, error);
+            }),
+          ),
+        ),
+      )
+      .then(() => self.skipWaiting()),
   );
 });
 
-self.addEventListener('activate', event => {
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-      ))
-      .then(() => self.clients.claim())
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim()),
   );
 });
 
-self.addEventListener('fetch', event => {
+self.addEventListener('fetch', (event) => {
   const request = event.request;
 
-  // Only handle GET requests; anything else goes straight to the network.
-  if (request.method !== 'GET') {
-    return;
-  }
+  // Only GETs are handled; everything else goes straight to the network.
+  if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
 
-  // Never cache video pages, downloads or cross-origin API calls.
-  if (url.pathname.startsWith('/prod/') || url.origin !== self.location.origin) {
-    return;
-  }
+  // Never touch video pages, downloads, or anything off-origin other than the
+  // pinned CDN assets.
+  if (url.pathname.startsWith('/prod/')) return;
+  if (url.origin !== self.location.origin && !url.href.startsWith(CDN)) return;
 
-  // Navigations and HTML are served network-first so a deploy is visible
-  // immediately, falling back to the cache when offline.
-  const isDocument = request.mode === 'navigate' ||
-    (request.headers.get('accept') || '').includes('text/html');
+  // HTML is network-first so a deploy is visible immediately, falling back to
+  // the cache when offline. The prerendered pages are the whole point of the
+  // site, so they must never be served stale.
+  const isDocument =
+    request.mode === 'navigate' || (request.headers.get('accept') || '').includes('text/html');
 
   if (isDocument) {
     event.respondWith(
       fetch(request)
-        .then(response => {
+        .then((response) => {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
           return response;
         })
-        .catch(() => caches.match(request))
+        .catch(() => caches.match(request)),
     );
     return;
   }
 
-  // Static assets are content-stable, so cache-first is safe and fast.
+  // Static assets: serve from the cache and refresh in the background, so an
+  // updated icon or image is picked up on the next visit.
   event.respondWith(
-    caches.match(request).then(response => response || fetch(request))
+    caches.match(request).then((cached) => {
+      const network = fetch(request)
+        .then((response) => {
+          if (response && response.status === 200 && response.type === 'basic') {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() => cached);
+
+      return cached || network;
+    }),
   );
 });
