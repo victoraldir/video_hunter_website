@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Reddit Video Downloader — Save Videos with Sound | Video Hunter</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Download Reddit videos for free, with sound. Paste the post link and save the MP4 to your phone or computer — no signup, no watermark, works on v.redd.it posts.">
+    <link rel="canonical" href="https://www.myvideohunter.com/reddit-video-downloader.html">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="manifest" href="/assets/manifest.json">
+    <meta name="theme-color" content="#0d6efd">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Reddit Video Downloader — Save Videos with Sound">
+    <meta name="twitter:description" content="Paste the Reddit post link and save the video with sound. Free, no signup.">
+    <meta name="twitter:image" content="https://www.myvideohunter.com/assets/og-image.png">
+    <meta property="og:title" content="Reddit Video Downloader — Save Videos with Sound">
+    <meta property="og:description" content="Paste the Reddit post link and save the video with sound. Free, no signup.">
+    <meta property="og:image" content="https://www.myvideohunter.com/assets/og-image.png">
+    <meta property="og:url" content="https://www.myvideohunter.com/reddit-video-downloader.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Video Hunter">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MBT9KLR914"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-MBT9KLR914');
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Video Hunter", "item": "https://www.myvideohunter.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Reddit video downloader", "item": "https://www.myvideohunter.com/reddit-video-downloader.html" }
+          ]
+        },
+        {
+          "@type": "HowTo",
+          "name": "How to download a video from Reddit",
+          "totalTime": "PT1M",
+          "step": [
+            { "@type": "HowToStep", "position": 1, "name": "Copy the post link", "text": "Open the Reddit post with the video and copy its link, or tap Share and Copy link." },
+            { "@type": "HowToStep", "position": 2, "name": "Paste the link", "text": "Paste the Reddit link into the download box on this page." },
+            { "@type": "HowToStep", "position": 3, "name": "Download", "text": "Click the download button and save the video to your device." }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Can I download Reddit videos with sound?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Yes. Reddit stores video and audio separately, and Video Hunter serves the combined file so the downloaded video has sound." }
+            },
+            {
+              "@type": "Question",
+              "name": "Do Reddit video links from any subreddit work?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Yes. Any public post that contains a video works, including posts served from v.redd.it, and posts shared as a link or from the Reddit app." }
+            },
+            {
+              "@type": "Question",
+              "name": "Why does my Reddit video download without sound?",
+              "acceptedAnswer": { "@type": "Answer", "text": "That usually means the video was saved from the HLS playlist instead of the combined MP4. Use the download button on this page rather than saving the stream directly." }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I download videos from private subreddits?",
+              "acceptedAnswer": { "@type": "Answer", "text": "No. Video Hunter can only download videos from public posts." }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">Video Hunter</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/x-video-downloader.html">X (Twitter)</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="/reddit-video-downloader.html">Reddit</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/bluesky-video-downloader.html">Bluesky</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/telegram-bot.html">Telegram bot</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/faq.html">FAQ</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="container-fluid p-md-5 p-4 bg-primary text-white text-center">
+        <h1 class="display-5 fw-bold">Reddit Video Downloader</h1>
+        <p class="lead col-md-8 mx-auto">Paste the link to a Reddit post and save the video with sound. Free, no signup, no watermark.</p>
+        <div id="app" class="mt-4 col-md-8 mx-auto"></div>
+    </header>
+
+    <main>
+        <section class="py-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <h2 class="h3">How to download a video from Reddit</h2>
+                        <ol class="lead">
+                            <li>Open the Reddit post with the video and copy its link (tap <em>Share</em> &rarr; <em>Copy link</em>).</li>
+                            <li>Paste the link into the box above and click <strong>Download</strong>.</li>
+                            <li>Video Hunter returns the video file, with audio.</li>
+                            <li>Click download and the video is saved to your device.</li>
+                        </ol>
+                        <p>Links from <code>reddit.com</code>, <code>old.reddit.com</code> and <code>v.redd.it</code> are all supported, including posts shared from the Reddit mobile app.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-5 bg-light">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <h2 class="h3">Frequently asked questions about Reddit videos</h2>
+                        <p><b>Will the downloaded video have sound?</b><br>
+                            Yes. Reddit keeps video and audio in separate streams; Video Hunter serves them combined, so the file you download plays with sound.</p>
+                        <p><b>Do all subreddits work?</b><br>
+                            Any public post with a video works, including posts served from <code>v.redd.it</code>.</p>
+                        <p><b>Why did a video download without audio?</b><br>
+                            That happens when the HLS playlist is saved instead of the combined MP4. Use the download button on this page rather than saving the stream directly.</p>
+                        <p><b>Can I download from private subreddits?</b><br>
+                            No, only public posts can be downloaded. See the <a href="/faq.html">FAQ</a> for more.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <h2 class="h3">Download videos from other platforms</h2>
+                        <p>Video Hunter also downloads videos from:</p>
+                        <ul class="lead">
+                            <li><a href="/x-video-downloader.html">X (Twitter) video downloader</a></li>
+                            <li><a href="/bluesky-video-downloader.html">Bluesky video downloader</a></li>
+                            <li>Or use the <a href="/telegram-bot.html">Telegram bot</a> to send links straight from your chat app</li>
+                        </ul>
+                        <p class="text-muted small">Please make sure you have the right to download the content you save. Video Hunter streams videos directly from the platform's content delivery network and does not store them.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center py-4 mt-auto bg-dark text-white">
+        <div class="container">
+            <p class="mb-0">&copy; Video Hunter. All rights reserved.</p>
+            <p class="mb-0">
+                <a href="/x-video-downloader.html" class="text-white-50">X (Twitter)</a> |
+                <a href="/reddit-video-downloader.html" class="text-white-50">Reddit</a> |
+                <a href="/bluesky-video-downloader.html" class="text-white-50">Bluesky</a> |
+                <a href="/telegram-bot.html" class="text-white-50">Telegram bot</a> |
+                <a href="/faq.html" class="text-white-50">FAQ</a> |
+                <a href="/policy.html" class="text-white-50">Privacy Policy</a>
+            </p>
+        </div>
+    </footer>
+    <script type="module" src="/src/js/videoForm.js"></script>
+</body>
+</html>
