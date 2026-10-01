@@ -2,21 +2,22 @@
 import { RouterLink } from 'vue-router'
 
 import VideoForm from '@/components/VideoForm.vue'
+import { useLocale } from '@/composables/useLocale'
+import { pagePaths } from '@/data/locales'
+
+const { copy, localize } = useLocale()
 </script>
 
 <template>
   <div class="container py-5 text-center">
-    <h1 class="display-6">Page not found</h1>
-    <p class="lead">
-      The page you are looking for does not exist. Paste a video link below to download a video from X (Twitter),
-      Reddit or Bluesky.
-    </p>
+    <h1 class="display-6">{{ copy.notFound.heading }}</h1>
+    <p class="lead">{{ copy.notFound.lead }}</p>
 
     <VideoForm />
 
     <p class="mt-4">
-      <RouterLink to="/">Go to the Video Hunter home page</RouterLink> or read the
-      <RouterLink to="/faq.html">FAQ</RouterLink>.
+      <RouterLink :to="localize(pagePaths.home)">{{ copy.notFound.goHome }}</RouterLink
+      >{{ copy.notFound.orRead }}<RouterLink :to="localize(pagePaths.faq)">{{ copy.notFound.faqLink }}</RouterLink>.
     </p>
   </div>
 </template>

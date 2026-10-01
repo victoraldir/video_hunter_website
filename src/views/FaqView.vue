@@ -2,26 +2,29 @@
 import { RouterLink } from 'vue-router'
 
 import FaqList from '@/components/FaqList.vue'
-import { faqEntries } from '@/data/faq'
+import { useLocale } from '@/composables/useLocale'
+import { pagePaths } from '@/data/locales'
 import { telegramBotUrl } from '@/data/site'
+
+const { copy, localize } = useLocale()
 </script>
 
 <template>
   <div class="container py-5">
     <div class="row">
       <div class="col-lg-9 mx-auto">
-        <h1 class="mb-3">Frequently Asked Questions</h1>
+        <h1 class="mb-3">{{ copy.faq.heading }}</h1>
         <p class="lead">
-          Everything you need to know about downloading videos with Video Hunter. Still stuck?
-          <RouterLink to="/">Paste a link on the home page</RouterLink> or message
-          <a :href="telegramBotUrl" target="_blank" rel="noopener">@MyVideoHunterBot</a> on Telegram.
+          {{ copy.faq.lead.before
+          }}<RouterLink :to="localize(pagePaths.home)">{{ copy.faq.lead.homeLink }}</RouterLink
+          >{{ copy.faq.lead.between
+          }}<a :href="telegramBotUrl" target="_blank" rel="noopener">{{ copy.telegramHandle }}</a
+          >{{ copy.faq.lead.after }}
         </p>
 
-        <FaqList :entries="faqEntries" />
+        <FaqList :entries="copy.faq.entries" />
 
-        <p class="text-muted small mt-4">
-          Please make sure you have the right to download the content you save. Video Hunter respects content creators.
-        </p>
+        <p class="text-muted small mt-4">{{ copy.faq.legalNote }}</p>
       </div>
     </div>
   </div>

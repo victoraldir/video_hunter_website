@@ -1,220 +1,302 @@
-import type { RouteRecordRaw, RouterOptions } from 'vue-router'
+import type { RouteComponent, RouteMeta, RouteRecordRaw, RouterOptions } from 'vue-router'
 
-import { faqEntries, faqJsonLd } from '@/data/faq'
-import { platformList } from '@/data/platforms'
-import { breadcrumbJsonLd, graph, howToJsonLd } from '@/data/schema'
+import {
+  defaultLocale,
+  dictionaries,
+  localizedPath,
+  locales,
+  routerAlias,
+  routerPath,
+  platformIds,
+  platformPaths,
+  pagePaths,
+  type Locale,
+} from '@/data/locales'
+import { breadcrumbJsonLd, faqJsonLd, graph, howToJsonLd } from '@/data/schema'
 import { siteUrl } from '@/data/site'
+import type { SeoText } from '@/data/locales/types'
 
 // Route metadata drives every SEO tag on the page (see src/App.vue), so each
 // route declares its own title, description, canonical and structured data.
+// `locale` and `logicalPath` are what let App.vue build the hreflang alternates
+// without listing every translation by hand.
 declare module 'vue-router' {
   interface RouteMeta {
     title: string
     description: string
     canonical: string
+    locale: Locale
+    /** The English address of the page, shared by every locale. */
+    logicalPath: string
     robots?: string
     jsonld?: Record<string, unknown>
   }
 }
 
-const telegramHowTo = [
-  { name: 'Open the bot', text: 'Open @MyVideoHunterBot in Telegram and press Start.' },
-  { name: 'Send a video link', text: 'Send the link to a post with a video from X (Twitter), Reddit or Bluesky.' },
-  { name: 'Get your download link', text: 'The bot replies with a download link you can open on any device.' },
-]
+/** A route name that is stable for English and suffixed for the others. */
+function routeName(locale: Locale, name: string): string {
+  return locale === defaultLocale ? name : `${name}-${locale}`
+}
 
-const telegramFaq = [
-  {
-    question: 'What is @MyVideoHunterBot?',
-    answer:
-      'It is the Telegram bot for Video Hunter. Send it a link to a post with a video from X (Twitter), Reddit or Bluesky and it replies with a download link.',
-  },
-  { question: 'Is the Video Hunter Telegram bot free?', answer: 'Yes, the bot is free and needs no registration.' },
-  {
-    question: 'Why did the bot not reply?',
-    answer:
-      'The bot can be busy or rate limited by the platform. Wait a moment and send the link again. Make sure the post is public and actually contains a video.',
-  },
-  {
-    question: 'Does the bot store my videos?',
-    answer:
-      'No. Video Hunter streams videos directly from the platform\'s content delivery network and does not store them.',
-  },
-]
+interface PageMetaInput {
+  locale: Locale
+  logicalPath: string
+  seo: SeoText
+  jsonld?: Record<string, unknown>
+  robots?: string
+}
 
-/**
- * Routes are declared without the .html extension so vite-ssg emits flat
- * files (dist/faq.html for /faq). The .html form is kept as an alias so the
- * URLs that are already indexed, linked and sitemapped keep resolving.
- */
-const platformRoutes: RouteRecordRaw[] = platformList.map((page) => ({
-  path: page.path.replace(/\.html$/, ''),
-  alias: page.path,
-  name: `platform-${page.key}`,
-  component: () => import('@/views/PlatformDownloaderView.vue'),
-  props: { platform: page.key },
-  meta: {
-    title: page.title,
-    description: page.description,
-    canonical: `${siteUrl}${page.path}`,
-    jsonld: graph(
-      breadcrumbJsonLd(page.heading, page.path),
-      howToJsonLd(page.howToHeading, page.howTo),
-      faqJsonLd(page.faq),
-    ),
-  },
-}))
+function pageMeta({ locale, logicalPath, seo, jsonld, robots }: PageMetaInput): RouteMeta {
+  return {
+    title: seo.title,
+    description: seo.description,
+    canonical: `${siteUrl}${localizedPath(locale, logicalPath)}`,
+    locale,
+    logicalPath,
+    ...(robots ? { robots } : {}),
+    ...(jsonld ? { jsonld } : {}),
+  }
+}
 
-export const routes: RouteRecordRaw[] = [
-  {
-    path: '/',
+interface PageInput {
+  locale: Locale
+  name: string
+  logicalPath: string
+  component: RouteComponent
+  meta: RouteMeta
+  props?: RouteRecordRaw['props']
+}
+
+function page({ locale, name, logicalPath, component, meta, props }: PageInput): RouteRecordRaw {
+  const alias = routerAlias(locale, logicalPath)
+
+  return {
+    path: routerPath(locale, logicalPath),
+    name: routeName(locale, name),
+    component,
+    meta,
+    ...(props ? { props } : {}),
+    ...(alias ? { alias } : {}),
+  }
+}
+
+function homeRoute(locale: Locale): RouteRecordRaw {
+  const copy = dictionaries[locale]
+  const logicalPath = pagePaths.home
+  const loc = localizedPath(locale, logicalPath)
+
+  return page({
+    locale,
     name: 'home',
+    logicalPath,
     component: () => import('@/views/HomeView.vue'),
-    meta: {
-      title: 'Video Hunter — Free Video Downloader for X (Twitter), Reddit & Bluesky',
-      description:
-        'Download videos from X (Twitter), Reddit and Bluesky for free. Paste a video link and save it in HD in seconds — no signup, no watermark. Also available as a Telegram bot.',
-      canonical: `${siteUrl}/`,
+    meta: pageMeta({
+      locale,
+      logicalPath,
+      seo: copy.home.seo,
       jsonld: graph(
         {
           '@type': 'WebSite',
           '@id': `${siteUrl}/#website`,
-          url: `${siteUrl}/`,
-          name: 'Video Hunter',
-          description: 'Free online video downloader for X (Twitter), Reddit and Bluesky.',
-          inLanguage: 'en',
+          url: `${siteUrl}${loc}`,
+          name: copy.siteName,
+          description: copy.home.websiteDescription,
+          inLanguage: locale,
         },
         {
           '@type': 'SoftwareApplication',
           '@id': `${siteUrl}/#app`,
-          name: 'Video Hunter',
-          url: `${siteUrl}/`,
+          name: copy.siteName,
+          url: `${siteUrl}${loc}`,
           applicationCategory: 'MultimediaApplication',
           operatingSystem: 'Any (web browser)',
-          description:
-            'Download videos from X (Twitter), Reddit and Bluesky. Paste a video link and save it in HD in seconds.',
+          description: copy.home.appDescription,
           offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-          featureList: [
-            'Download videos from X (Twitter)',
-            'Download videos from Reddit',
-            'Download videos from Bluesky',
-            'Download videos through a Telegram bot',
-          ],
-          publisher: { '@type': 'Organization', name: 'Video Hunter', url: `${siteUrl}/` },
+          featureList: copy.home.featureList,
+          publisher: { '@type': 'Organization', name: copy.siteName, url: `${siteUrl}/` },
         },
       ),
-    },
-  },
-  ...platformRoutes,
-  {
-    path: '/telegram-bot',
-    alias: '/telegram-bot.html',
-    name: 'telegram-bot',
-    component: () => import('@/views/TelegramBotView.vue'),
-    meta: {
-      title: 'Video Hunter Telegram Bot — Download Videos in Chat | Video Hunter',
-      description:
-        'Send a video link to @MyVideoHunterBot on Telegram and get a download link back. Works with X (Twitter), Reddit and Bluesky. Free, no signup, right inside your chat app.',
-      canonical: `${siteUrl}/telegram-bot.html`,
+    }),
+  })
+}
+
+function platformRoute(locale: Locale, id: (typeof platformIds)[number]): RouteRecordRaw {
+  const copy = dictionaries[locale]
+  const platform = copy.platforms[id]
+  const logicalPath = platformPaths[id]
+  const loc = localizedPath(locale, logicalPath)
+
+  return page({
+    locale,
+    name: `platform-${id}`,
+    logicalPath,
+    component: () => import('@/views/PlatformDownloaderView.vue'),
+    props: { platform: id },
+    meta: pageMeta({
+      locale,
+      logicalPath,
+      seo: platform.seo,
       jsonld: graph(
-        breadcrumbJsonLd('Telegram bot', '/telegram-bot.html'),
-        howToJsonLd('How to download a video with the Video Hunter Telegram bot', telegramHowTo),
-        faqJsonLd(telegramFaq),
+        breadcrumbJsonLd(platform.heading, loc, copy.siteName, localizedPath(locale, pagePaths.home)),
+        howToJsonLd(platform.howToHeading, platform.howTo),
+        faqJsonLd(platform.faq),
       ),
-    },
-  },
-  {
-    path: '/faq',
-    alias: '/faq.html',
+    }),
+  })
+}
+
+function telegramRoute(locale: Locale): RouteRecordRaw {
+  const copy = dictionaries[locale]
+  const logicalPath = pagePaths.telegram
+  const loc = localizedPath(locale, logicalPath)
+
+  return page({
+    locale,
+    name: 'telegram-bot',
+    logicalPath,
+    component: () => import('@/views/TelegramBotView.vue'),
+    meta: pageMeta({
+      locale,
+      logicalPath,
+      seo: copy.telegram.seo,
+      jsonld: graph(
+        breadcrumbJsonLd(copy.telegram.heading, loc, copy.siteName, localizedPath(locale, pagePaths.home)),
+        howToJsonLd(copy.telegram.howToHeading, copy.telegram.howTo),
+        faqJsonLd(copy.telegram.faq),
+      ),
+    }),
+  })
+}
+
+function faqRoute(locale: Locale): RouteRecordRaw {
+  const copy = dictionaries[locale]
+
+  return page({
+    locale,
     name: 'faq',
+    logicalPath: pagePaths.faq,
     component: () => import('@/views/FaqView.vue'),
-    meta: {
-      title: 'Video Downloader FAQ — Video Hunter',
-      description:
-        'Frequently asked questions about downloading videos from X (Twitter), Reddit and Bluesky with Video Hunter: supported platforms, video quality, iOS saving, limits and privacy.',
-      canonical: `${siteUrl}/faq.html`,
-      jsonld: faqJsonLd(faqEntries),
-    },
-  },
-  {
-    path: '/policy',
-    alias: '/policy.html',
+    meta: pageMeta({
+      locale,
+      logicalPath: pagePaths.faq,
+      seo: copy.faq.seo,
+      jsonld: faqJsonLd(copy.faq.entries),
+    }),
+  })
+}
+
+function policyRoute(locale: Locale): RouteRecordRaw {
+  return page({
+    locale,
     name: 'policy',
+    logicalPath: pagePaths.policy,
     component: () => import('@/views/PolicyView.vue'),
-    meta: {
-      title: 'Privacy Policy — Video Hunter',
-      description:
-        'How Video Hunter handles information when you download videos from X (Twitter), Reddit and Bluesky: log files, cookies, Google Analytics, Google AdSense, and the optional account and chat data if you sign in.',
-      canonical: `${siteUrl}/policy.html`,
-    },
-  },
-  {
-    path: '/login',
-    alias: '/login.html',
+    meta: pageMeta({ locale, logicalPath: pagePaths.policy, seo: dictionaries[locale].policy.seo }),
+  })
+}
+
+function loginRoute(locale: Locale): RouteRecordRaw {
+  return page({
+    locale,
     name: 'login',
+    logicalPath: pagePaths.login,
     component: () => import('@/views/LoginView.vue'),
-    meta: {
-      title: 'Sign in — Video Hunter',
-      description:
-        'Sign in to Video Hunter to keep the videos you find in folders and join the chat on a video page. Downloading videos never needs an account.',
-      canonical: `${siteUrl}/login.html`,
-      // A login page is not something to index: it only exists for people who
-      // already know about it.
+    // A login page is not something to index: it only exists for people who
+    // already know about it.
+    meta: pageMeta({
+      locale,
+      logicalPath: pagePaths.login,
+      seo: dictionaries[locale].login.seo,
       robots: 'noindex, follow',
-    },
-  },
-  {
-    // The path registered as the callback of the Cognito app client.
-    path: '/auth/callback',
-    alias: '/auth/callback.html',
+    }),
+  })
+}
+
+function authCallbackRoute(locale: Locale): RouteRecordRaw {
+  return page({
+    locale,
     name: 'auth-callback',
+    // The path registered as the callback of the Cognito app client.
+    logicalPath: '/auth/callback.html',
     component: () => import('@/views/AuthCallbackView.vue'),
-    meta: {
-      title: 'Signing in — Video Hunter',
-      description: 'Completing the sign in.',
-      canonical: `${siteUrl}/auth/callback.html`,
+    meta: pageMeta({
+      locale,
+      logicalPath: '/auth/callback.html',
+      seo: dictionaries[locale].authCallback.seo,
       robots: 'noindex, nofollow',
-    },
-  },
-  {
-    path: '/library',
-    alias: '/library.html',
+    }),
+  })
+}
+
+function libraryRoute(locale: Locale): RouteRecordRaw {
+  return page({
+    locale,
     name: 'library',
+    logicalPath: pagePaths.library,
     component: () => import('@/views/LibraryView.vue'),
-    meta: {
-      title: 'Your library — Video Hunter',
-      description: 'The videos you saved, organised in folders you choose.',
-      canonical: `${siteUrl}/library.html`,
-      // Private to each visitor, and empty without a login.
+    // Private to each visitor, and empty without a login.
+    meta: pageMeta({
+      locale,
+      logicalPath: pagePaths.library,
+      seo: dictionaries[locale].library.seo,
       robots: 'noindex, follow',
-    },
-  },
-  {
-    // Prerendered to dist/404.html, which CloudFront serves for missing keys
-    // (see the 403 -> /404.html error mapping in the SAM template).
+    }),
+  })
+}
+
+/**
+ * Prerendered to dist/404.html, which CloudFront serves for missing keys (see
+ * the 403 -> /404.html error mapping in the SAM template). English only: the
+ * CDN error mapping points at this one file.
+ */
+function notFoundPageRoute(): RouteRecordRaw {
+  const locale = defaultLocale
+  const logicalPath = '/404'
+
+  return {
     path: '/404',
     name: 'not-found-page',
     component: () => import('@/views/NotFoundView.vue'),
     meta: {
-      title: 'Page not found — Video Hunter',
-      description:
-        'This page does not exist. Download videos from X (Twitter), Reddit and Bluesky from the Video Hunter home page.',
+      ...pageMeta({ locale, logicalPath, seo: dictionaries[locale].notFound.seo, robots: 'noindex, follow' }),
       canonical: `${siteUrl}/`,
-      robots: 'noindex, follow',
     },
-  },
-  {
-    path: '/:pathMatch(.*)*',
-    name: 'not-found',
+  }
+}
+
+/** The catch-all: any unknown address renders the localized not found page. */
+function catchAllRoute(locale: Locale): RouteRecordRaw {
+  const prefix = locale === defaultLocale ? '' : `/${locale}`
+
+  return {
+    path: `${prefix}/:pathMatch(.*)*`,
+    name: routeName(locale, 'not-found'),
     component: () => import('@/views/NotFoundView.vue'),
     meta: {
-      title: 'Page not found — Video Hunter',
-      description:
-        'This page does not exist. Download videos from X (Twitter), Reddit and Bluesky from the Video Hunter home page.',
-      canonical: `${siteUrl}/`,
-      robots: 'noindex, follow',
+      ...pageMeta({
+        locale,
+        logicalPath: '/404',
+        seo: dictionaries[locale].notFound.seo,
+        robots: 'noindex, follow',
+      }),
+      canonical: `${siteUrl}${localizedPath(locale, pagePaths.home)}`,
     },
-  },
+  }
+}
+
+export const routes: RouteRecordRaw[] = [
+  ...locales.flatMap((locale) => [
+    homeRoute(locale),
+    ...platformIds.map((id) => platformRoute(locale, id)),
+    telegramRoute(locale),
+    faqRoute(locale),
+    policyRoute(locale),
+    loginRoute(locale),
+    authCallbackRoute(locale),
+    libraryRoute(locale),
+  ]),
+  notFoundPageRoute(),
+  ...locales.map(catchAllRoute),
 ]
 
 /**

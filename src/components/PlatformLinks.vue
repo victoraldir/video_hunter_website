@@ -2,26 +2,32 @@
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 
-import { navLinks } from '@/data/site'
+import { useLocale } from '@/composables/useLocale'
+import { platformIds, platformPaths } from '@/data/locales'
 
 const props = defineProps<{ current?: string }>()
 
+const { copy, localize } = useLocale()
+
 /** Every platform except the one this page is about. */
 const otherPlatforms = computed(() =>
-  navLinks.filter((link) => link.to !== '/faq.html' && link.to !== props.current),
+  platformIds
+    .filter((id) => platformPaths[id] !== props.current)
+    .map((id) => ({
+      key: id,
+      path: platformPaths[id],
+      label: copy.value.platforms[id].heading,
+    })),
 )
 </script>
 
 <template>
-  <h2 class="h3">Download videos from other platforms</h2>
-  <p>Video Hunter also downloads videos from:</p>
+  <h2 class="h3">{{ copy.platformLinks.heading }}</h2>
+  <p>{{ copy.platformLinks.lead }}</p>
   <ul class="lead">
-    <li v-for="link in otherPlatforms" :key="link.to">
-      <RouterLink :to="link.to">{{ link.label }} downloader</RouterLink>
+    <li v-for="link in otherPlatforms" :key="link.key">
+      <RouterLink :to="localize(link.path)">{{ link.label }}</RouterLink>
     </li>
   </ul>
-  <p class="text-muted small">
-    Please make sure you have the right to download the content you save. Video Hunter streams videos directly from
-    the platform's content delivery network and does not store them.
-  </p>
+  <p class="text-muted small">{{ copy.platformLinks.note }}</p>
 </template>

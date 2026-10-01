@@ -35,19 +35,52 @@ as a router alias, so client-side navigation resolves either way.
 src/
   main.ts                     ViteSSG entry: creates the app, registers the service worker
   App.vue                     layout + every SEO tag, driven by route meta
-  router/index.ts             routes and their title/description/canonical/structured data
+  router/index.ts             one set of routes per locale, with their title/description/canonical/structured data
   views/                      one component per page
   components/                 SiteHeader, SiteFooter, VideoForm, FaqList, HowToSteps, PlatformLinks
   composables/useVideoDownload.ts   form state machine (validation, retries, typed errors)
-  services/apiService.ts      typed client for the download API
-  data/                       content: FAQ entries, platform pages, schema builders, site constants
-public/                       icons, manifest, robots.txt, sitemap.xml, llms.txt, service worker
+  composables/useLocale.ts    the current locale and its copy
+  services/                   typed clients for the download, config, auth and account APIs
+  data/locales/locale.ts      locale primitives: the list, the URL helpers, hreflang alternates
+  data/locales/types.ts       the Dictionary interface every language implements
+  data/locales/{en,pt,es}.ts  the copy, one file per language
+  data/routes.ts              the logical pages, shared by the router and the sitemap
+  data/schema.ts              structured data builders
+  data/site.ts                site constants (URL, Telegram bot)
+public/                       icons, manifest, robots.txt, llms.txt, service worker
 ```
 
 Content lives in `src/data/`, not in the templates: the FAQ accordion and its
 `FAQPage` structured data are generated from the same list, and the three
-platform pages are rendered by one view from `data/platforms.ts`. That is
-deliberate — the pages previously drifted apart and shipped contradictory copy.
+platform pages are rendered by one view from the dictionary. That is deliberate
+— the pages previously drifted apart and shipped contradictory copy.
+
+## Languages
+
+The site is published in English, Brazilian Portuguese and Spanish. English is
+the default and stays at the root, because those URLs are already indexed; the
+others live under a prefix (`/pt/faq.html`, `/es/...`).
+
+- A page's logical path is the English one (`/faq.html`) and is shared by every
+  locale. `localizedPath` turns it into a real URL for a given locale.
+- `src/data/locales/{en,pt,es}.ts` each implement the same `Dictionary`
+  interface, so a missing field is a type error rather than a blank string.
+  English is the source; the other two mirror it.
+- The router builds every route once per locale from that dictionary, so
+  nothing about a page (title, description, canonical, structured data) can be
+  translated in one place and forgotten in another.
+- Each page gets `hreflang` alternates (including `x-default` pointing at
+  English) and its own `<html lang>`. A language switcher in the header links to
+  the same page in the other locales.
+- `sitemap.xml` is generated at build time by a Vite plugin from the same page
+  list and locale helpers, so it always matches the routes and carries the
+  alternates. It is not committed.
+- Locale follows the URL, never `Accept-Language`: a crawler and a visitor must
+  see the same language at the same address, and CloudFront caches the pages.
+
+The server-rendered video pages (`/prod/url/{id}`), which live in the API repo,
+are still English only.
+
 
 ## Development
 
@@ -79,7 +112,12 @@ exist the deploy job is skipped, so pull requests only build.
 
 - Every route declares its own `title`, `description`, `canonical` and
   `jsonld` in `src/router/index.ts`; `App.vue` applies them. A page cannot ship
-  without metadata, and no two pages share a title or description.
+  without metadata, and no two pages share a title or description. Routes are
+  generated per locale, so the same holds for every language.
+- Copy lives in `src/data/locales/`. When you add a page, add its strings to
+  all three dictionaries: the `Dictionary` interface makes a missing or
+  mistyped field a compile error. Never hardcode a user-facing string in a
+  component.
 - Keep copy in `src/data/` when it is reused, so the rendered text and the
   structured data cannot disagree.
 - The service worker is network-first for HTML (deploys are visible

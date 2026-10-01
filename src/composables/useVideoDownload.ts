@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue'
 
+import { copy } from '@/composables/useLocale'
 import {
   detectPlatform,
   getDownloadLink,
@@ -28,7 +29,7 @@ export function useVideoDownload() {
     if (!isSupportedUrl(videoUrl.value)) {
       error.value = {
         kind: 'invalidLink',
-        message: 'Please enter a valid link to a post from X (Twitter), Reddit or Bluesky.',
+        message: copy().errors.invalidLink,
       }
       return
     }
@@ -40,10 +41,10 @@ export function useVideoDownload() {
         const response = await postVideoUrl(videoUrl.value.trim())
 
         if (!response?.id) {
-          throw { kind: 'network', message: 'Unexpected response from the server. Please try again.' } as DownloadError
+          throw { kind: 'network', message: copy().errors.unexpectedResponse } as DownloadError
         }
 
-        successMessage.value = 'Your download is ready — opening it now.'
+        successMessage.value = copy().errors.downloadReady
         loading.value = false
 
         window.setTimeout(() => {
@@ -112,7 +113,7 @@ function asDownloadError(value: unknown): DownloadError {
     return value as DownloadError
   }
 
-  return { kind: 'network', message: 'Something went wrong, please try again.' }
+  return { kind: 'network', message: copy().errors.network }
 }
 
 function delay(ms: number): Promise<void> {

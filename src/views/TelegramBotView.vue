@@ -1,47 +1,31 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import FaqList from '@/components/FaqList.vue'
 import HowToSteps from '@/components/HowToSteps.vue'
-import type { FaqEntry } from '@/data/faq'
-import type { HowToStep } from '@/data/schema'
-import { platformList } from '@/data/platforms'
+import { useLocale } from '@/composables/useLocale'
+import { pagePaths, platformIds, platformPaths } from '@/data/locales'
 import { telegramBotUrl } from '@/data/site'
 
-const howTo: HowToStep[] = [
-  { name: 'Open the bot', text: 'Open @MyVideoHunterBot in Telegram and press Start.' },
-  { name: 'Send a video link', text: 'Send the link to a post with a video from X (Twitter), Reddit or Bluesky.' },
-  { name: 'Get your download link', text: 'The bot replies with a download link you can open on any device.' },
-]
+const { copy, localize } = useLocale()
 
-const faq: FaqEntry[] = [
-  { question: 'Is the bot free?', answer: 'Yes, and it needs no registration.' },
-  {
-    question: 'Which platforms does it support?',
-    answer: 'X (Twitter), Reddit and Bluesky — the same platforms as the website.',
-  },
-  {
-    question: 'Why did the bot not reply?',
-    answer:
-      'It can be busy or rate limited by the platform. Wait a moment and send the link again, and make sure the post is public and contains a video.',
-  },
-  {
-    question: 'Does the bot store my videos?',
-    answer:
-      'No. Videos are streamed directly from the platform\'s content delivery network and are not stored on our servers.',
-  },
-]
+const platforms = computed(() =>
+  platformIds.map((id) => ({
+    key: id,
+    path: platformPaths[id],
+    heading: copy.value.platforms[id].heading,
+  })),
+)
 </script>
 
 <template>
   <header class="container-fluid p-md-5 p-4 bg-primary text-white text-center">
-    <h1 class="display-5 fw-bold">Video Hunter Telegram Bot</h1>
-    <p class="lead col-md-8 mx-auto">
-      Send a video link in Telegram and get a download link back. No app to install, no signup.
-    </p>
+    <h1 class="display-5 fw-bold">{{ copy.telegram.heading }}</h1>
+    <p class="lead col-md-8 mx-auto">{{ copy.telegram.lead }}</p>
     <p class="mt-3">
       <a class="btn btn-light btn-lg" :href="telegramBotUrl" target="_blank" rel="noopener">
-        Open @MyVideoHunterBot
+        {{ copy.telegram.openBot }}
       </a>
     </p>
   </header>
@@ -50,8 +34,8 @@ const faq: FaqEntry[] = [
     <div class="container">
       <div class="row">
         <div class="col-lg-8 mx-auto">
-          <HowToSteps :steps="howTo" heading="How to download videos with the bot" />
-          <p>It works in the Telegram app on iOS, Android, desktop and in the web client.</p>
+          <HowToSteps :steps="copy.telegram.howTo" :heading="copy.telegram.howToHeading" />
+          <p>{{ copy.telegram.worksOn }}</p>
         </div>
       </div>
     </div>
@@ -61,8 +45,8 @@ const faq: FaqEntry[] = [
     <div class="container">
       <div class="row">
         <div class="col-lg-8 mx-auto">
-          <h2 class="h3 mb-4">Frequently asked questions about the bot</h2>
-          <FaqList :entries="faq" />
+          <h2 class="h3 mb-4">{{ copy.telegram.faqHeading }}</h2>
+          <FaqList :entries="copy.telegram.faq" />
         </div>
       </div>
     </div>
@@ -72,14 +56,15 @@ const faq: FaqEntry[] = [
     <div class="container">
       <div class="row">
         <div class="col-lg-8 mx-auto">
-          <h2 class="h3">Prefer the website?</h2>
+          <h2 class="h3">{{ copy.telegram.preferTitle }}</h2>
           <p>
-            You can also paste a link directly on the <RouterLink to="/">Video Hunter home page</RouterLink>, or use a
-            dedicated page for your platform:
+            {{ copy.telegram.preferLead.before
+            }}<RouterLink :to="localize(pagePaths.home)">{{ copy.telegram.preferLead.link }}</RouterLink
+            >{{ copy.telegram.preferLead.after }}
           </p>
           <ul class="lead">
-            <li v-for="page in platformList" :key="page.key">
-              <RouterLink :to="page.path">{{ page.heading }}</RouterLink>
+            <li v-for="page in platforms" :key="page.key">
+              <RouterLink :to="localize(page.path)">{{ page.heading }}</RouterLink>
             </li>
           </ul>
         </div>

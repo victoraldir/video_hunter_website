@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import type { HowToStep } from '@/data/schema'
+import { useLocale } from '@/composables/useLocale'
+import type { StepText } from '@/data/locales/types'
 
-defineProps<{ steps: HowToStep[]; heading?: string }>()
+defineProps<{ steps: StepText[]; heading?: string }>()
+
+const { copy } = useLocale()
 </script>
 
 <template>
-  <h2 class="h3">{{ heading ?? 'How it works' }}</h2>
+  <h2 class="h3">{{ heading ?? copy.howTo.fallbackHeading }}</h2>
   <ol class="how-to-steps">
     <li v-for="step in steps" :key="step.name">
       <strong>{{ step.name }}</strong> — {{ step.text }}

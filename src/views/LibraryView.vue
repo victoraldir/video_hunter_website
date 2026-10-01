@@ -3,6 +3,8 @@ import { onMounted, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 
 import { useAuth } from '@/composables/useAuth'
+import { useLocale } from '@/composables/useLocale'
+import { pagePaths } from '@/data/locales'
 import { getDownloadLink } from '@/services/apiService'
 import { forgetSession } from '@/services/authService'
 import {
@@ -24,6 +26,7 @@ import {
 
 const route = useRoute()
 const { user, loginAvailable, ready, refresh } = useAuth()
+const { copy, localize } = useLocale()
 
 const folders = ref<Folder[]>([])
 const blocks = ref<string[]>([])
@@ -83,7 +86,7 @@ async function saveNickname(): Promise<void> {
     const profile = await getProfile()
     nickname.value = profile.nickname
     nicknameDraft.value = profile.nickname
-    nicknameNotice.value = 'Saved. Your new nickname is now shown in chat.'
+    nicknameNotice.value = copy.value.library.nicknameSaved
   } catch (failure) {
     handle(failure)
   } finally {
@@ -95,7 +98,7 @@ async function saveNickname(): Promise<void> {
 function handle(failure: unknown): void {
   if (failure instanceof NotSignedInError) {
     user.value = null
-    error.value = 'Your session has ended. Please sign in again.'
+    error.value = copy.value.library.sessionEnded
     return
   }
 
@@ -104,7 +107,7 @@ function handle(failure: unknown): void {
     return
   }
 
-  error.value = 'Something went wrong. Please try again.'
+  error.value = copy.value.library.genericError
 }
 
 async function addFolder(): Promise<void> {
@@ -143,7 +146,8 @@ async function confirmRename(folder: Folder): Promise<void> {
 }
 
 async function removeFolder(folder: Folder): Promise<void> {
-  if (!window.confirm(`Delete "${folder.name}" and the videos saved in it?`)) return
+  const question = copy.value.library.confirmDeleteFolder.replace('{name}', folder.name)
+  if (!window.confirm(question)) return
 
   try {
     await deleteFolder(folder.id)
@@ -193,7 +197,11 @@ async function removeAccount(): Promise<void> {
 function videoTitle(video: SavedVideo): string {
   const description = video.description?.trim()
 
-  return description ? description : 'Video'
+  return description ? description : copy.value.library.videoFallback
+}
+
+function savedCount(folder: Folder): string {
+  return copy.value.library.savedCount.replace('{count}', String(folder.videos.length))
 }
 
 function videoPage(video: SavedVideo): string {
@@ -203,59 +211,58 @@ function videoPage(video: SavedVideo): string {
 
 <template>
   <div class="container py-5">
-    <h1 class="mb-4">Your library</h1>
+    <h1 class="mb-4">{{ copy.library.heading }}</h1>
 
     <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
 
     <div v-if="deleted" class="alert alert-success" role="alert">
-      <h2 class="h5">Your account has been deleted</h2>
-      <p class="mb-0">
-        Your folders, the videos saved in them and your chat messages are gone. Downloading still works without an
-        account, and you can create a new one at any time.
-      </p>
+      <h2 class="h5">{{ copy.library.deletedTitle }}</h2>
+      <p class="mb-0">{{ copy.library.deletedBody }}</p>
     </div>
 
     <div v-else-if="!user" class="row">
       <div class="col-lg-7">
-        <p class="lead">Sign in to keep the videos you find, organised in folders you choose.</p>
+        <p class="lead">{{ copy.library.signInLead }}</p>
         <p v-if="ready && !loginAvailable" class="text-muted">
-          Signing in is not available right now. You can still download videos from the
-          <RouterLink to="/">home page</RouterLink>.
+          {{ copy.common.signInUnavailable.before
+          }}<RouterLink :to="localize(pagePaths.home)">{{ copy.common.signInUnavailable.link }}</RouterLink
+          >{{ copy.common.signInUnavailable.after }}
         </p>
         <RouterLink
           v-else
           class="btn btn-primary"
-          :to="{ path: '/login.html', query: { return: route.path } }"
+          :to="{ path: localize(pagePaths.login), query: { return: route.path } }"
         >
-          Sign in
+          {{ copy.nav.signIn }}
         </RouterLink>
       </div>
     </div>
 
     <div v-else>
-      <p v-if="loading" class="text-muted">Loading your folders…</p>
+      <p v-if="loading" class="text-muted">{{ copy.library.loading }}</p>
 
       <form class="row g-2 mb-4" @submit.prevent="addFolder">
         <div class="col-sm-6">
-          <label class="visually-hidden" for="new-folder">New folder name</label>
+          <label class="visually-hidden" for="new-folder">{{ copy.library.newFolderName }}</label>
           <input
             id="new-folder"
             v-model="newFolderName"
             class="form-control"
             type="text"
             maxlength="60"
-            placeholder="New folder name"
+            :placeholder="copy.library.newFolderName"
           />
         </div>
         <div class="col-auto">
           <button class="btn btn-outline-primary" type="submit" :disabled="busy || !newFolderName.trim()">
-            Create folder
+            {{ copy.library.createFolder }}
           </button>
         </div>
       </form>
 
       <p v-if="!loading && folders.length === 0" class="text-muted">
-        You have no folders yet. Create one, then use the <strong>Save to folder</strong> button on any video page.
+        {{ copy.library.emptyFoldersBefore }}<strong>{{ copy.library.emptyFoldersStrong }}</strong
+        >{{ copy.library.emptyFoldersAfter }}
       </p>
 
       <section v-for="folder in folders" :key="folder.id" class="card mb-4">
@@ -269,18 +276,26 @@ function videoPage(video: SavedVideo): string {
                 maxlength="60"
                 @keyup.enter="confirmRename(folder)"
               />
-              <button class="btn btn-sm btn-primary" type="button" @click="confirmRename(folder)">Save</button>
-              <button class="btn btn-sm btn-link" type="button" @click="renamingId = ''">Cancel</button>
+              <button class="btn btn-sm btn-primary" type="button" @click="confirmRename(folder)">
+                {{ copy.library.save }}
+              </button>
+              <button class="btn btn-sm btn-link" type="button" @click="renamingId = ''">
+                {{ copy.library.cancel }}
+              </button>
             </template>
             <template v-else>
               <h2 class="h5 mb-0">{{ folder.name }}</h2>
-              <span class="text-muted small">{{ folder.videos.length }} saved</span>
-              <button class="btn btn-sm btn-link ms-auto" type="button" @click="startRename(folder)">Rename</button>
-              <button class="btn btn-sm btn-link text-danger" type="button" @click="removeFolder(folder)">Delete</button>
+              <span class="text-muted small">{{ savedCount(folder) }}</span>
+              <button class="btn btn-sm btn-link ms-auto" type="button" @click="startRename(folder)">
+                {{ copy.library.rename }}
+              </button>
+              <button class="btn btn-sm btn-link text-danger" type="button" @click="removeFolder(folder)">
+                {{ copy.library.delete }}
+              </button>
             </template>
           </div>
 
-          <p v-if="folder.videos.length === 0" class="text-muted mb-0">Nothing saved here yet.</p>
+          <p v-if="folder.videos.length === 0" class="text-muted mb-0">{{ copy.library.nothingSaved }}</p>
 
           <div v-else class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
             <div v-for="video in folder.videos" :key="video.video_id" class="col">
@@ -296,9 +311,9 @@ function videoPage(video: SavedVideo): string {
                 <div class="card-body d-flex flex-column">
                   <p class="card-text small flex-grow-1">{{ videoTitle(video) }}</p>
                   <div class="d-flex gap-2">
-                    <a class="btn btn-sm btn-primary" :href="videoPage(video)">Open</a>
+                    <a class="btn btn-sm btn-primary" :href="videoPage(video)">{{ copy.library.open }}</a>
                     <button class="btn btn-sm btn-outline-danger" type="button" @click="removeSaved(folder, video)">
-                      Remove
+                      {{ copy.library.remove }}
                     </button>
                   </div>
                 </div>
@@ -310,22 +325,19 @@ function videoPage(video: SavedVideo): string {
 
       <section class="card mb-4">
         <div class="card-body">
-          <h2 class="h5">Your nickname in chat</h2>
-          <p class="text-muted small mb-3">
-            A nickname was generated for you, and it is the only name a chat room shows. It is not your email address,
-            and nothing else about your account is public.
-          </p>
+          <h2 class="h5">{{ copy.library.nicknameHeading }}</h2>
+          <p class="text-muted small mb-3">{{ copy.library.nicknameHelp }}</p>
 
           <form class="row g-2" @submit.prevent="saveNickname">
             <div class="col-sm-6">
-              <label class="visually-hidden" for="nickname">Nickname</label>
+              <label class="visually-hidden" for="nickname">{{ copy.library.nicknameLabel }}</label>
               <input
                 id="nickname"
                 v-model="nicknameDraft"
                 class="form-control"
                 type="text"
                 maxlength="20"
-                placeholder="Your nickname"
+                :placeholder="copy.library.nicknamePlaceholder"
               />
             </div>
             <div class="col-auto">
@@ -334,7 +346,7 @@ function videoPage(video: SavedVideo): string {
                 type="submit"
                 :disabled="savingNickname || !nicknameDraft.trim() || nicknameDraft.trim() === nickname"
               >
-                Save nickname
+                {{ copy.library.saveNickname }}
               </button>
             </div>
           </form>
@@ -344,38 +356,35 @@ function videoPage(video: SavedVideo): string {
       </section>
 
       <section v-if="blocks.length > 0">
-        <h2 class="h5">Blocked in chat</h2>
-        <p class="text-muted small">
-          You no longer see messages from these accounts in any chat room. Blocking only affects what you see.
-        </p>
+        <h2 class="h5">{{ copy.library.blocksHeading }}</h2>
+        <p class="text-muted small">{{ copy.library.blocksHelp }}</p>
         <ul class="list-inline">
           <li v-for="blocked in blocks" :key="blocked" class="list-inline-item">
             <span class="badge text-bg-secondary">{{ blocked }}</span>
-            <button class="btn btn-sm btn-link" type="button" @click="unblock(blocked)">Unblock</button>
+            <button class="btn btn-sm btn-link" type="button" @click="unblock(blocked)">
+              {{ copy.library.unblock }}
+            </button>
           </li>
         </ul>
       </section>
 
       <section class="border border-danger rounded p-3 mt-5">
-        <h2 class="h5 text-danger">Delete your account</h2>
-        <p>
-          This deletes your account and everything held against it: your folders, the videos saved in them, your chat
-          messages and your block list. Videos you already downloaded stay on your device. It cannot be undone.
-        </p>
+        <h2 class="h5 text-danger">{{ copy.library.deleteAccountHeading }}</h2>
+        <p>{{ copy.library.deleteAccountBody }}</p>
 
         <div v-if="!confirmingDelete">
           <button class="btn btn-outline-danger" type="button" @click="confirmingDelete = true">
-            Delete my account
+            {{ copy.library.deleteAccountButton }}
           </button>
         </div>
 
         <div v-else class="d-flex flex-wrap align-items-center gap-2">
-          <span class="fw-semibold">Delete your account and everything in it?</span>
+          <span class="fw-semibold">{{ copy.library.deleteAccountConfirm }}</span>
           <button class="btn btn-danger" type="button" :disabled="deleting" @click="removeAccount">
-            {{ deleting ? 'Deleting…' : 'Yes, delete my account' }}
+            {{ deleting ? copy.library.deleting : copy.library.deleteAccountYes }}
           </button>
           <button class="btn btn-link" type="button" :disabled="deleting" @click="confirmingDelete = false">
-            Cancel
+            {{ copy.library.cancel }}
           </button>
         </div>
       </section>
