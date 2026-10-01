@@ -28,26 +28,30 @@ export function isLocale(value: string): value is Locale {
  * The public URL of a logical page in one locale. Logical paths are the English
  * ones (for example `/faq.html`) and are shared by every locale, so a page has
  * one canonical address per language and nothing is lost in translation.
+ *
+ * A locale home is `/pt/index.html`, not `/pt/`: the bucket is served by
+ * CloudFront in front of S3, its default root object only covers `/`, and the
+ * `.html` convention is what every other page already relies on. A directory
+ * index would need a CloudFront rewrite function to resolve.
  */
 export function localizedPath(locale: Locale, path: string): string {
   if (locale === defaultLocale) return path
 
-  return path === '/' ? `/${locale}/` : `/${locale}${path}`
+  return path === '/' ? `/${locale}/index.html` : `/${locale}${path}`
 }
 
 /**
  * The vue-router path for a logical page. Routes are declared without the
  * `.html` extension so vite-ssg emits flat files, exactly as the English pages
- * already do. The root keeps its trailing slash so it is emitted as an
- * `index.html` inside the locale directory.
+ * already do.
  */
 export function routerPath(locale: Locale, path: string): string {
   return localizedPath(locale, path).replace(/\.html$/, '')
 }
 
-/** The `.html` alias, kept so indexed URLs keep resolving. Undefined at root. */
+/** The `.html` form, kept so the canonical and indexed URLs keep resolving. */
 export function routerAlias(locale: Locale, path: string): string | undefined {
-  if (path === '/') return undefined
+  if (locale === defaultLocale && path === '/') return undefined
 
   return localizedPath(locale, path)
 }
