@@ -33,8 +33,18 @@
   var messageNodes = {}
   /** The user id this browser writes under, as stated by the room. */
   var ownUserId = ''
+  /** Whether the panel is open, so re-rendering does not close it under the reader. */
+  var chatOpen = false
+  /** Set by renderChat, so the Escape key can close the current panel. */
+  var setChatOpen = null
 
   start()
+
+  // The panel behaves like a dialog, so Escape closes it. Registered once, at
+  // load; it reaches whatever panel is on screen through setChatOpen.
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && chatOpen && setChatOpen) setChatOpen(false)
+  })
 
   async function start() {
     if (!videoId) return
@@ -348,8 +358,14 @@
   // ---------------------------------------------------------------------------
 
   /**
-   * Draws the room. Everyone gets to read it; the composer only appears for a
-   * signed in visitor, and a guest gets the login prompt in its place.
+   * Draws the room as a panel hanging off a button in the corner, rather than
+   * as a section in the flow of the page. The flow on a video page belongs to
+   * the download buttons and the ad units, and a chat sitting below both of
+   * them is one nobody scrolls far enough to find. Nothing here moves the ads,
+   * which is what the page is paid on.
+   *
+   * Everyone gets to read the room; the composer only appears for a signed in
+   * visitor, and a guest gets the login prompt in its place.
    */
   function renderChat() {
     var host = document.getElementById('vh-chat')
@@ -363,29 +379,101 @@
 
     host.textContent = ''
 
-    host.appendChild(element('h2', { class: 'h5', text: 'Chat about this video' }))
-
-    var status = element('p', { class: 'small text-muted' })
+    var status = element('p', { class: 'small text-muted mb-2' })
     status.textContent = session ? 'Connecting…' : 'Everyone can read this room. Log in to join in.'
 
     var list = element('div', {
       class: 'border rounded p-2 mb-2',
-      style: 'max-height: 320px; overflow-y: auto; background: #fff',
+      style: 'flex: 1 1 auto; min-height: 9rem; overflow-y: auto; background: #fff',
     })
 
     var notice = element('p', { class: 'small mb-0 mt-1' })
 
-    host.appendChild(status)
-    host.appendChild(list)
+    var header = element('div', { class: 'd-flex align-items-center justify-content-between mb-2' })
+    header.appendChild(element('h2', { class: 'h6 mb-0', text: 'Chat about this video' }))
+
+    var close = element('button', {
+      class: 'btn btn-sm btn-link text-muted p-0 text-decoration-none',
+      type: 'button',
+      'aria-label': 'Close the chat',
+      text: '\u2715',
+    })
+    header.appendChild(close)
+
+    var panel = element('div', {
+      id: 'vh-chat-panel',
+      role: 'dialog',
+      'aria-label': 'Chat about this video',
+      // Fixed, so the panel cannot push the download buttons or the ads around,
+      // and so it stays within reach wherever the reader has scrolled to. The
+      // z-index is below the 1050 of the download overlay, so that overlay still
+      // covers the chat while a download is being prepared.
+      style:
+        'position: fixed; right: 16px; bottom: 88px; z-index: 1040;' +
+        ' width: min(360px, calc(100vw - 32px)); max-height: min(70vh, 520px);' +
+        ' display: flex; flex-direction: column; background: #fff;' +
+        ' border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 0.75rem;' +
+        ' box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2)',
+    })
+    // Display is set directly rather than through the `hidden` attribute: the
+    // panel carries an inline `display: flex`, which outranks the `[hidden]`
+    // rule unless Bootstrap's reboot marks it important.
+    panel.style.display = chatOpen ? 'flex' : 'none'
+
+    panel.appendChild(header)
+    panel.appendChild(status)
+    panel.appendChild(list)
 
     if (session && config.cognito && config.cognito.enabled) {
-      host.appendChild(composer(notice))
+      panel.appendChild(composer(notice))
       loadBlocks()
     } else {
-      host.appendChild(loginPrompt())
+      panel.appendChild(loginPrompt())
     }
 
-    host.appendChild(notice)
+    panel.appendChild(notice)
+
+    var launcher = element('button', {
+      class: 'btn btn-primary rounded-circle shadow',
+      type: 'button',
+      'aria-controls': 'vh-chat-panel',
+      'aria-expanded': String(chatOpen),
+      'aria-label': 'Open the chat about this video',
+      style:
+        'position: fixed; right: 16px; bottom: 16px; z-index: 1040;' +
+        ' width: 3.5rem; height: 3.5rem;' +
+        ' display: flex; align-items: center; justify-content: center',
+    })
+    launcher.appendChild(chatIcon())
+
+    host.appendChild(panel)
+    host.appendChild(launcher)
+
+    /** Opens or closes the panel, keeping the button and the keyboard in step. */
+    function setOpen(open) {
+      chatOpen = open
+      panel.style.display = open ? 'flex' : 'none'
+      launcher.setAttribute('aria-expanded', String(open))
+
+      if (!open) return
+
+      list.scrollTop = list.scrollHeight
+
+      var input = panel.querySelector('input')
+      if (input) input.focus()
+    }
+
+    // This render is now the one the Escape key and the buttons drive.
+    setChatOpen = setOpen
+
+    close.addEventListener('click', function () {
+      setOpen(false)
+      launcher.focus()
+    })
+
+    launcher.addEventListener('click', function () {
+      setOpen(!chatOpen)
+    })
 
     openSocket(list, status, notice)
   }
@@ -431,6 +519,36 @@
     row.appendChild(element('a', { class: 'btn btn-primary btn-sm', href: loginUrl(), text: 'Log in' }))
 
     return row
+  }
+
+  /**
+   * The speech bubble on the launcher. Drawn rather than loaded: the video page
+   * carries no icon font, and a second request for one button is not worth it.
+   * The two paths are Bootstrap Icons' chat-dots, which matches the icons the
+   * rest of the site gets from that set.
+   */
+  function chatIcon() {
+    var ns = 'http://www.w3.org/2000/svg'
+    var svg = document.createElementNS(ns, 'svg')
+
+    svg.setAttribute('viewBox', '0 0 16 16')
+    svg.setAttribute('width', '22')
+    svg.setAttribute('height', '22')
+    svg.setAttribute('fill', 'currentColor')
+    svg.setAttribute('aria-hidden', 'true')
+
+    var paths = [
+      'M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2',
+      'm2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9 9 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.4 10.4 0 0 1-.524 2.318l-.003.011a11 11 0 0 1-.244.637c-.079.186.074.394.273.362a22 22 0 0 0 .693-.125m.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6-3.004 6-7 6a8 8 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a11 11 0 0 0 .398-2',
+    ]
+
+    paths.forEach(function (d) {
+      var path = document.createElementNS(ns, 'path')
+      path.setAttribute('d', d)
+      svg.appendChild(path)
+    })
+
+    return svg
   }
 
   async function loadBlocks() {
