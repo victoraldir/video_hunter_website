@@ -144,8 +144,49 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       title: 'Privacy Policy — Video Hunter',
       description:
-        'How Video Hunter handles information when you download videos from X (Twitter), Reddit and Bluesky: log files, cookies, Google Analytics and Google AdSense advertising.',
+        'How Video Hunter handles information when you download videos from X (Twitter), Reddit and Bluesky: log files, cookies, Google Analytics, Google AdSense, and the optional account and chat data if you sign in.',
       canonical: `${siteUrl}/policy.html`,
+    },
+  },
+  {
+    path: '/login',
+    alias: '/login.html',
+    name: 'login',
+    component: () => import('@/views/LoginView.vue'),
+    meta: {
+      title: 'Sign in — Video Hunter',
+      description:
+        'Sign in to Video Hunter to keep the videos you find in folders and join the chat on a video page. Downloading videos never needs an account.',
+      canonical: `${siteUrl}/login.html`,
+      // A login page is not something to index: it only exists for people who
+      // already know about it.
+      robots: 'noindex, follow',
+    },
+  },
+  {
+    // The path registered as the callback of the Cognito app client.
+    path: '/auth/callback',
+    alias: '/auth/callback.html',
+    name: 'auth-callback',
+    component: () => import('@/views/AuthCallbackView.vue'),
+    meta: {
+      title: 'Signing in — Video Hunter',
+      description: 'Completing the sign in.',
+      canonical: `${siteUrl}/auth/callback.html`,
+      robots: 'noindex, nofollow',
+    },
+  },
+  {
+    path: '/library',
+    alias: '/library.html',
+    name: 'library',
+    component: () => import('@/views/LibraryView.vue'),
+    meta: {
+      title: 'Your library — Video Hunter',
+      description: 'The videos you saved, organised in folders you choose.',
+      canonical: `${siteUrl}/library.html`,
+      // Private to each visitor, and empty without a login.
+      robots: 'noindex, follow',
     },
   },
   {

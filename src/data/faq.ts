@@ -19,7 +19,17 @@ export const faqEntries: FaqEntry[] = [
   {
     question: 'Is Video Hunter free?',
     answer:
-      'Yes. Video Hunter is free and requires no account or signup. Videos are streamed directly from the platforms\' content delivery networks and are not stored on our servers.',
+      'Yes. Video Hunter is free and you need no account to download a video. Videos are streamed directly from the platforms\' content delivery networks and are not stored on our servers.',
+  },
+  {
+    question: 'Do I need an account to use Video Hunter?',
+    answer:
+      'No. Downloading works with no account and no signup, and always will. An optional free account only adds two things: keeping the videos you find in folders, and joining the chat on a video page. You can sign in with an email address or a Google account.',
+  },
+  {
+    question: 'How does the chat on a video page work?',
+    answer:
+      'Every video page has a chat room about that video. It is open to signed in users only, so guests do not see the conversation. You can delete your own messages, report a message, or block an account so you stop seeing what they write.',
   },
   {
     question: 'Can I download videos with a Telegram bot instead?',

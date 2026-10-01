@@ -1,9 +1,27 @@
 <script setup lang="ts">
-import { RouterLink, useRoute } from 'vue-router'
+import { onMounted } from 'vue'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 
+import { useAuth } from '@/composables/useAuth'
 import { navLinks } from '@/data/site'
 
 const route = useRoute()
+const router = useRouter()
+const { user, loginAvailable, refresh, signOut } = useAuth()
+
+// The header is on every page, so this is where the stored session is picked
+// up on the first render in the browser.
+onMounted(() => {
+  void refresh()
+})
+
+async function doSignOut(): Promise<void> {
+  await signOut()
+
+  // signOut navigates away when Cognito is configured; this covers the case
+  // where it is not, so the header still reflects the signing out.
+  await router.push('/')
+}
 
 /** Aliases are used for the indexed .html URLs, so match on either form. */
 function isActive(to: string): boolean {
@@ -50,6 +68,29 @@ function isActive(to: string): boolean {
           <li class="nav-item">
             <RouterLink class="nav-link" :class="{ active: isActive('/policy.html') }" to="/policy.html">
               Privacy Policy
+            </RouterLink>
+          </li>
+        </ul>
+
+        <!-- The account is optional, so nothing about it is shown until the
+             API confirms that a login is configured. -->
+        <ul class="navbar-nav mb-2 mb-lg-0">
+          <template v-if="user">
+            <li class="nav-item">
+              <RouterLink class="nav-link" :class="{ active: isActive('/library.html') }" to="/library.html">
+                Your library
+              </RouterLink>
+            </li>
+            <li class="nav-item">
+              <button class="btn btn-link nav-link" type="button" @click="doSignOut">Sign out</button>
+            </li>
+          </template>
+          <li v-else-if="loginAvailable" class="nav-item">
+            <RouterLink
+              class="nav-link"
+              :to="{ path: '/login.html', query: { return: route.fullPath } }"
+            >
+              Sign in
             </RouterLink>
           </li>
         </ul>
