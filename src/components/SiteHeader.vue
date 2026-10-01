@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { useAuth } from '@/composables/useAuth'
@@ -7,13 +7,18 @@ import { navLinks } from '@/data/site'
 
 const route = useRoute()
 const router = useRouter()
-const { user, loginAvailable, refresh, signOut } = useAuth()
+const { user, loginAvailable, refresh, syncSession, signOut } = useAuth()
 
 // The header is on every page, so this is where the stored session is picked
 // up on the first render in the browser.
 onMounted(() => {
   void refresh()
 })
+
+// The header stays mounted while the app navigates, and signing in finishes
+// with a navigation rather than a reload, so without this it would keep
+// showing the state it had when the page loaded.
+watch(() => route.fullPath, syncSession)
 
 async function doSignOut(): Promise<void> {
   await signOut()

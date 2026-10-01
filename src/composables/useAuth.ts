@@ -15,9 +15,18 @@ const ready = ref(false)
  * not configured, the site renders exactly as it did before accounts existed.
  */
 export function useAuth() {
+  /**
+   * Reads the stored session into the shared state. No network, so it is cheap
+   * enough to call whenever the account might have changed, which is what the
+   * sign in callback and every navigation do.
+   */
+  function syncSession(): void {
+    user.value = authSession()?.user ?? null
+  }
+
   /** Reads the stored session, and asks the API whether a login is offered. */
   async function refresh(): Promise<void> {
-    user.value = authSession()?.user ?? null
+    syncSession()
 
     const config = await loadConfig()
     loginAvailable.value = config.cognito.enabled
@@ -33,5 +42,5 @@ export function useAuth() {
     await endSession()
   }
 
-  return { user, loginAvailable, ready, refresh, signIn, signOut }
+  return { user, loginAvailable, ready, refresh, syncSession, signIn, signOut }
 }

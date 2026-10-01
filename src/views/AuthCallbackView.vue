@@ -2,9 +2,11 @@
 import { onMounted, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 
+import { useAuth } from '@/composables/useAuth'
 import { completeSignIn } from '@/services/authService'
 
 const router = useRouter()
+const { syncSession } = useAuth()
 const error = ref('')
 
 // Client only by definition: this page exists to turn the code Cognito sent
@@ -12,6 +14,18 @@ const error = ref('')
 onMounted(async () => {
   try {
     const returnPath = await completeSignIn()
+
+    // Nothing reloads the page here, so the header and anything else showing
+    // account state has to be told that the session now exists.
+    syncSession()
+
+    // Most of this site is the app and navigates in place, but a video page is
+    // served by the API and is not a route. Handing that to the router would
+    // land on the not found page, so those get a real page load.
+    if (router.resolve(returnPath).name === 'not-found') {
+      window.location.replace(returnPath)
+      return
+    }
 
     await router.replace(returnPath)
   } catch (failure) {
