@@ -1,4 +1,5 @@
 import { loadConfig } from '@/services/configService'
+import { copy } from '@/composables/useLocale'
 
 /**
  * Where the Cognito hosted UI returns the browser. The same path is the
@@ -54,7 +55,7 @@ export async function beginSignIn(returnPath: string): Promise<void> {
   const config = await loadConfig()
 
   if (!config.cognito.enabled) {
-    throw new AuthError('Sign in is not available right now.')
+    throw new AuthError(copy().auth.unavailable)
   }
 
   const verifier = randomUrlSafeString(32)
@@ -98,7 +99,7 @@ export async function completeSignIn(): Promise<string> {
   window.sessionStorage.removeItem(PKCE_KEY)
 
   if (!code || !state || !pkce || pkce.state !== state) {
-    throw new AuthError('That sign in response could not be verified. Please try again.')
+    throw new AuthError(copy().auth.unverified)
   }
 
   const tokens = await requestTokens(config.cognito.token_url, {
@@ -178,7 +179,7 @@ export async function signOut(): Promise<void> {
 
 function storeSession(tokens: TokenResponse, previousRefreshToken = ''): AuthSession {
   if (!tokens.id_token) {
-    throw new AuthError('The sign in service did not return a token.')
+    throw new AuthError(copy().auth.noToken)
   }
 
   const session: AuthSession = {
@@ -207,7 +208,7 @@ export function forgetSession(): void {
  */
 function decodeIdToken(token: string): AuthUser {
   const payload = token.split('.')[1]
-  if (!payload) throw new AuthError('The sign in service returned a malformed token.')
+  if (!payload) throw new AuthError(copy().auth.malformedToken)
 
   const claims = JSON.parse(new TextDecoder().decode(base64UrlToBytes(payload))) as {
     sub?: string
@@ -217,7 +218,7 @@ function decodeIdToken(token: string): AuthUser {
 
   return {
     id: claims.sub ?? '',
-    name: claims.name ?? claims.email?.split('@')[0] ?? 'You',
+    name: claims.name ?? claims.email?.split('@')[0] ?? copy().auth.displayNameFallback,
   }
 }
 
@@ -250,7 +251,7 @@ async function requestTokens(tokenUrl: string, body: Record<string, string>): Pr
   })
 
   if (!response.ok) {
-    throw new AuthError('The sign in service rejected the request.')
+    throw new AuthError(copy().auth.rejected)
   }
 
   return (await response.json()) as TokenResponse

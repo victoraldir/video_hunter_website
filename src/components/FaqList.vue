@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { FaqEntry } from '@/data/faq'
+import type { FaqText } from '@/data/locales/types'
 
-defineProps<{ entries: FaqEntry[] }>()
+defineProps<{ entries: FaqText[] }>()
 </script>
 
 <template>

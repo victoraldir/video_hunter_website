@@ -1,4 +1,5 @@
-import { platforms, type PlatformName } from '@/data/site'
+import { copy } from '@/composables/useLocale'
+import type { PlatformId } from '@/data/routes'
 
 export type DownloadErrorKind = 'invalidLink' | 'videoUnavailable' | 'serviceBusy' | 'network'
 
@@ -30,13 +31,13 @@ const SUPPORTED_HOSTS = [
 ]
 
 /** Detects the platform from a pasted link, or null when it is not supported. */
-export function detectPlatform(rawUrl: string): PlatformName | null {
+export function detectPlatform(rawUrl: string): PlatformId | null {
   const host = hostOf(rawUrl)
   if (!host) return null
 
-  if (host.endsWith('twitter.com') || host.endsWith('x.com')) return platforms.twitter
-  if (host.endsWith('reddit.com')) return platforms.reddit
-  if (host.endsWith('bsky.app')) return platforms.bluesky
+  if (host.endsWith('twitter.com') || host.endsWith('x.com')) return 'x'
+  if (host.endsWith('reddit.com')) return 'reddit'
+  if (host.endsWith('bsky.app')) return 'bluesky'
 
   return null
 }
@@ -59,7 +60,7 @@ export async function postVideoUrl(videoUrl: string): Promise<CreateVideoRespons
       headers: { 'Content-Type': 'application/json' },
     })
   } catch {
-    throw downloadError('network', 'Unable to connect to the server. Check your connection and try again.')
+    throw downloadError('network', copy().errors.network)
   }
 
   if (!response.ok) {
@@ -84,23 +85,21 @@ function hostOf(rawUrl: string): string | null {
 }
 
 // The API answers with {"message": "..."} for every failure and with a status
-// code that says whether the link itself is the problem.
+// code that says whether the link itself is the problem. The API writes in
+// English, so its message is used when it has one; the fallbacks are localized.
 async function errorFromResponse(response: Response): Promise<DownloadError> {
   const message = await messageOf(response)
 
   switch (response.status) {
     case 400:
-      return downloadError('invalidLink', message ?? 'That link is not supported. Paste a link from X, Reddit or Bluesky.')
+      return downloadError('invalidLink', message ?? copy().errors.notSupported)
     case 404:
-      return downloadError(
-        'videoUnavailable',
-        message ?? 'That post has no downloadable video. It may have been deleted, or it may not be a video.',
-      )
+      return downloadError('videoUnavailable', message ?? copy().errors.noVideo)
     case 502:
     case 503:
-      return downloadError('serviceBusy', message ?? 'The platform is not responding right now. Please try again in a moment.')
+      return downloadError('serviceBusy', message ?? copy().errors.serviceBusy)
     default:
-      return downloadError('network', message ?? 'Something went wrong while fetching the video. Please try again.')
+      return downloadError('network', message ?? copy().errors.fetchFailed)
   }
 }
 

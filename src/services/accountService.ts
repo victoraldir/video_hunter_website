@@ -1,3 +1,4 @@
+import { copy } from '@/composables/useLocale'
 import { siteUrl } from '@/data/site'
 import { validIdToken } from '@/services/authService'
 
@@ -39,7 +40,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   try {
     response = await fetch(`${siteUrl}/prod${path}`, { ...init, headers })
   } catch {
-    throw new AccountError('Unable to connect. Check your connection and try again.')
+    throw new AccountError(copy().errors.network)
   }
 
   if (response.status === 401) throw new NotSignedInError()
@@ -59,7 +60,7 @@ async function messageOf(response: Response): Promise<string> {
     // Not JSON: fall back to a generic message below.
   }
 
-  return 'Something went wrong. Please try again.'
+  return copy().library.genericError
 }
 
 export interface Profile {
