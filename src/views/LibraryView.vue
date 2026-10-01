@@ -4,10 +4,12 @@ import { RouterLink, useRoute } from 'vue-router'
 
 import { useAuth } from '@/composables/useAuth'
 import { getDownloadLink } from '@/services/apiService'
+import { forgetSession } from '@/services/authService'
 import {
   AccountError,
   NotSignedInError,
   createFolder,
+  deleteAccount,
   deleteFolder,
   listBlocks,
   listFolders,
@@ -30,6 +32,9 @@ const error = ref('')
 const newFolderName = ref('')
 const renamingId = ref('')
 const renameValue = ref('')
+const confirmingDelete = ref(false)
+const deleting = ref(false)
+const deleted = ref(false)
 
 onMounted(async () => {
   await refresh()
@@ -131,6 +136,25 @@ async function unblock(userId: string): Promise<void> {
   }
 }
 
+async function removeAccount(): Promise<void> {
+  deleting.value = true
+  error.value = ''
+
+  try {
+    await deleteAccount()
+
+    // The session belongs to an account that no longer exists, so it is not
+    // just misleading to keep, it is useless.
+    forgetSession()
+    user.value = null
+    deleted.value = true
+  } catch (failure) {
+    handle(failure)
+  } finally {
+    deleting.value = false
+  }
+}
+
 function videoTitle(video: SavedVideo): string {
   const description = video.description?.trim()
 
@@ -148,7 +172,15 @@ function videoPage(video: SavedVideo): string {
 
     <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
 
-    <div v-if="!user" class="row">
+    <div v-if="deleted" class="alert alert-success" role="alert">
+      <h2 class="h5">Your account has been deleted</h2>
+      <p class="mb-0">
+        Your folders, the videos saved in them and your chat messages are gone. Downloading still works without an
+        account, and you can create a new one at any time.
+      </p>
+    </div>
+
+    <div v-else-if="!user" class="row">
       <div class="col-lg-7">
         <p class="lead">Sign in to keep the videos you find, organised in folders you choose.</p>
         <p v-if="ready && !loginAvailable" class="text-muted">
@@ -252,6 +284,30 @@ function videoPage(video: SavedVideo): string {
             <button class="btn btn-sm btn-link" type="button" @click="unblock(blocked)">Unblock</button>
           </li>
         </ul>
+      </section>
+
+      <section class="border border-danger rounded p-3 mt-5">
+        <h2 class="h5 text-danger">Delete your account</h2>
+        <p>
+          This deletes your account and everything held against it: your folders, the videos saved in them, your chat
+          messages and your block list. Videos you already downloaded stay on your device. It cannot be undone.
+        </p>
+
+        <div v-if="!confirmingDelete">
+          <button class="btn btn-outline-danger" type="button" @click="confirmingDelete = true">
+            Delete my account
+          </button>
+        </div>
+
+        <div v-else class="d-flex flex-wrap align-items-center gap-2">
+          <span class="fw-semibold">Delete your account and everything in it?</span>
+          <button class="btn btn-danger" type="button" :disabled="deleting" @click="removeAccount">
+            {{ deleting ? 'Deleting…' : 'Yes, delete my account' }}
+          </button>
+          <button class="btn btn-link" type="button" :disabled="deleting" @click="confirmingDelete = false">
+            Cancel
+          </button>
+        </div>
       </section>
     </div>
   </div>

@@ -24,7 +24,7 @@ export const faqEntries: FaqEntry[] = [
   {
     question: 'Do I need an account to use Video Hunter?',
     answer:
-      'No. Downloading works with no account and no signup, and always will. An optional free account only adds two things: keeping the videos you find in folders, and joining the chat on a video page. You can sign in with an email address or a Google account.',
+      'No. Downloading works with no account and no signup, and always will. An optional free account only adds two things: keeping the videos you find in folders, and joining the chat on a video page. You can sign in with an email address or a Google account, and you can delete the account, and everything in it, whenever you want.',
   },
   {
     question: 'How does the chat on a video page work?',

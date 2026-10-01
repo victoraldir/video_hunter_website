@@ -115,3 +115,13 @@ export function blockUser(userId: string): Promise<void> {
 export function unblockUser(userId: string): Promise<void> {
   return request(`/me/blocks/${encodeURIComponent(userId)}`, { method: 'DELETE' })
 }
+
+/**
+ * Deletes the account and everything held against it: the folders, the videos
+ * saved in them, the chat messages and the block list. The API removes the
+ * rows first and the account last, so a failure part way through leaves an
+ * account that can still try again.
+ */
+export function deleteAccount(): Promise<void> {
+  return request('/me', { method: 'DELETE' })
+}

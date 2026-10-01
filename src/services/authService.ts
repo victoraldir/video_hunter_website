@@ -141,7 +141,7 @@ export async function validIdToken(): Promise<string | null> {
   if (session.expiresAt - now > REFRESH_MARGIN_SECONDS) return session.idToken
 
   if (!session.refreshToken) {
-    clearSession()
+    forgetSession()
     return null
   }
 
@@ -157,14 +157,14 @@ export async function validIdToken(): Promise<string | null> {
 
     return storeSession(tokens, session.refreshToken).idToken
   } catch {
-    clearSession()
+    forgetSession()
     return null
   }
 }
 
 /** Clears the local session and ends it at Cognito too. */
 export async function signOut(): Promise<void> {
-  clearSession()
+  forgetSession()
 
   const config = await loadConfig()
   if (!config.cognito.enabled) return
@@ -195,7 +195,8 @@ function storeSession(tokens: TokenResponse, previousRefreshToken = ''): AuthSes
   return session
 }
 
-function clearSession(): void {
+/** Clears the local session without ending it at Cognito. */
+export function forgetSession(): void {
   if (typeof window !== 'undefined') window.localStorage.removeItem(SESSION_KEY)
 }
 

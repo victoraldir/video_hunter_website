@@ -72,6 +72,7 @@ import { telegramBotUrl } from '@/data/site'
         <p>
           You can delete your own messages, report a message, or block an account. Reported messages are kept for
           review for up to 90 days so that we can act on abuse, which is required to keep advertising on these pages.
+          Deleting your account deletes the reports you filed with it.
         </p>
 
         <h2 class="h4 mt-4">Cookies and local storage</h2>
@@ -87,10 +88,11 @@ import { telegramBotUrl } from '@/data/site'
         <h2 class="h4 mt-4">Your rights</h2>
         <p>
           If you are in the EEA or the UK (GDPR) or in California (CCPA), you can ask for access to, correction of, or
-          deletion of your personal data, and you can object to processing. For account data — your folders, your saved
-          videos and your chat messages — contact us using the details below and we will delete the account and
-          everything held against it. Requests about analytics and advertising data relate to data controlled by
-          Google; we will help where we can.
+          deletion of your personal data, and you can object to processing. You can delete your own account, and
+          everything held against it, from the <RouterLink to="/library.html">Your library</RouterLink> page: the
+          folders, the saved videos, your chat messages and your block list go with it. If you would rather we did it,
+          contact us using the details below. Requests about analytics and advertising data relate to data controlled
+          by Google; we will help where we can.
         </p>
 
         <h2 class="h4 mt-4">Children</h2>
