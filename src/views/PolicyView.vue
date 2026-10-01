@@ -51,7 +51,7 @@ import { telegramBotUrl } from '@/data/site'
 
         <h2 class="h4 mt-4">If you sign in (optional)</h2>
         <p>
-          Signing in is optional and only adds two things: keeping videos in folders, and joining the chat on a video
+          Signing in is optional and only adds two things: keeping videos in folders, and posting in the chat on a video
           page. Accounts are held by Amazon Cognito. If you sign in with an email address you create a password there;
           if you sign in with Google we receive your email address and your name from Google. We never see or store
           your password.
@@ -59,15 +59,17 @@ import { telegramBotUrl } from '@/data/site'
         <p>When you are signed in we store, against an internal account identifier:</p>
         <ul>
           <li><strong>Your folders and saved videos.</strong> A folder name, and the identifier of each video you saved. The video itself is not copied.</li>
-          <li><strong>Your chat messages</strong>, together with the display name shown next to them.</li>
+          <li><strong>Your nickname.</strong> A nickname is generated for you, and it is the only name shown in chat. It is not derived from your email address, and you can change it at any time.</li>
+          <li><strong>Your chat messages</strong>, stored with that nickname and no other name.</li>
           <li><strong>Your block list</strong>, if you block an account in chat.</li>
         </ul>
 
         <h2 class="h4 mt-4">Chat</h2>
         <p>
-          The chat room on a video page is only visible to signed in users. Messages are stored for up to 30 days and
-          are then deleted automatically, along with your display name on them. Please do not post personal
-          information: anything you write can be read by other signed in users, and by us when a message is reported.
+          The chat room on a video page is public: anyone visiting that page can read it, whether or not they have an
+          account. Posting requires signing in. Messages are stored for up to 30 days and are then deleted
+          automatically, along with the nickname on them. Please do not post personal information: anything you write
+          can be read by anyone, and by us when a message is reported.
         </p>
         <p>
           You can delete your own messages, report a message, or block an account. Reported messages are kept for

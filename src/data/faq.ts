@@ -24,12 +24,12 @@ export const faqEntries: FaqEntry[] = [
   {
     question: 'Do I need an account to use Video Hunter?',
     answer:
-      'No. Downloading works with no account and no signup, and always will. An optional free account only adds two things: keeping the videos you find in folders, and joining the chat on a video page. You can sign in with an email address or a Google account, and you can delete the account, and everything in it, whenever you want.',
+      'No. Downloading works with no account and no signup, and always will. An optional free account only adds two things: keeping the videos you find in folders, and posting in the chat on a video page. You can sign in with an email address or a Google account, and you can delete the account, and everything in it, whenever you want.',
   },
   {
     question: 'How does the chat on a video page work?',
     answer:
-      'Every video page has a chat room about that video. It is open to signed in users only, so guests do not see the conversation. You can delete your own messages, report a message, or block an account so you stop seeing what they write.',
+      'Every video page has a chat room about that video, and anyone can read it. Posting needs a free account, which is what keeps the room from filling with spam. You write under a nickname that is generated for you, never your email address, and you can change it from your library. You can delete your own messages, report a message, or block an account so you stop seeing what they write.',
   },
   {
     question: 'Can I download videos with a Telegram bot instead?',

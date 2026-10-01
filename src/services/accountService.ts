@@ -62,6 +62,19 @@ async function messageOf(response: Response): Promise<string> {
   return 'Something went wrong. Please try again.'
 }
 
+export interface Profile {
+  user_id: string
+  nickname: string
+}
+
+export async function getProfile(): Promise<Profile> {
+  return request<Profile>('/me')
+}
+
+export async function setNickname(nickname: string): Promise<void> {
+  return request('/me', { method: 'PATCH', body: JSON.stringify({ nickname }) })
+}
+
 export async function listFolders(): Promise<Folder[]> {
   const body = await request<{ folders: Folder[] }>('/me/folders')
 

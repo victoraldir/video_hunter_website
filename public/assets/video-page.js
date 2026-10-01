@@ -31,6 +31,8 @@
   var socket = null
   var reconnectAttempts = 0
   var messageNodes = {}
+  /** The user id this browser writes under, as stated by the room. */
+  var ownUserId = ''
 
   start()
 
@@ -46,6 +48,7 @@
 
     session = readSession()
 
+    renderAccount()
     renderSave()
     renderChat()
   }
@@ -131,12 +134,60 @@
     window.localStorage.removeItem(SESSION_KEY)
   }
 
-  function userName() {
-    return session && session.user && session.user.name ? session.user.name : 'you'
+  /**
+   * Clears the local session and ends it at Cognito too, the same way the site
+   * header does, so signing out here does not leave a usable session behind.
+   */
+  function signOut() {
+    forgetSession()
+
+    if (!config || !config.cognito || !config.cognito.enabled) {
+      window.location.reload()
+      return
+    }
+
+    var url = new URL(config.cognito.logout_url)
+    url.searchParams.set('client_id', config.cognito.client_id)
+    url.searchParams.set('logout_uri', window.location.origin + '/')
+
+    window.location.assign(url.toString())
   }
 
   function loginUrl() {
     return '/login.html?return=' + encodeURIComponent(window.location.pathname)
+  }
+
+  // ---------------------------------------------------------------------------
+  // Account links
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Fills in the account end of the navbar. The page is cached and identical
+   * for everyone, so the signed out link is in the HTML and this only replaces
+   * it once a session is known to exist. The link gets the way back to this
+   * video, which the cached HTML cannot know.
+   */
+  function renderAccount() {
+    var host = document.getElementById('vh-account')
+    if (!host) return
+
+    var login = document.getElementById('vh-login')
+    if (login) login.setAttribute('href', loginUrl())
+
+    if (!session || !config || !config.cognito || !config.cognito.enabled) return
+
+    host.textContent = ''
+
+    var library = element('li', { class: 'nav-item' })
+    library.appendChild(element('a', { class: 'nav-link', href: '/library.html', text: 'Your library' }))
+
+    var exit = element('li', { class: 'nav-item' })
+    var button = element('button', { class: 'btn btn-link nav-link', type: 'button', text: 'Sign out' })
+    button.addEventListener('click', signOut)
+    exit.appendChild(button)
+
+    host.appendChild(library)
+    host.appendChild(exit)
   }
 
   /** A small helper for the token protected endpoints. */
@@ -296,34 +347,50 @@
   // Chat
   // ---------------------------------------------------------------------------
 
+  /**
+   * Draws the room. Everyone gets to read it; the composer only appears for a
+   * signed in visitor, and a guest gets the login prompt in its place.
+   */
   function renderChat() {
     var host = document.getElementById('vh-chat')
     if (!host) return
 
-    if (!session) {
-      // Members only: nothing of the conversation is shown, not even read only.
-      if (!config || !config.cognito || !config.cognito.enabled) return
+    if (!config || !config.chat_ws_url) return
 
-      host.appendChild(element('h2', { class: 'h5', text: 'Chat about this video' }))
-      host.appendChild(
-        element('p', { class: 'text-muted', text: 'Log in to join the conversation on this video.' }),
-      )
-      host.appendChild(element('a', { class: 'btn btn-primary', href: loginUrl(), text: 'Log in to chat' }))
-      return
-    }
+    // Re-reading the session matters when this is called again after a token
+    // was refused: the same visitor comes back as a guest.
+    session = readSession()
 
-    if (!config.chat_ws_url) return
+    host.textContent = ''
 
     host.appendChild(element('h2', { class: 'h5', text: 'Chat about this video' }))
 
     var status = element('p', { class: 'small text-muted' })
-    status.textContent = 'Connecting…'
+    status.textContent = session ? 'Connecting…' : 'Everyone can read this room. Log in to join in.'
 
     var list = element('div', {
       class: 'border rounded p-2 mb-2',
       style: 'max-height: 320px; overflow-y: auto; background: #fff',
     })
 
+    var notice = element('p', { class: 'small mb-0 mt-1' })
+
+    host.appendChild(status)
+    host.appendChild(list)
+
+    if (session && config.cognito && config.cognito.enabled) {
+      host.appendChild(composer(notice))
+      loadBlocks()
+    } else {
+      host.appendChild(loginPrompt())
+    }
+
+    host.appendChild(notice)
+
+    openSocket(list, status, notice)
+  }
+
+  function composer(notice) {
     var form = element('form', { class: 'd-flex gap-2' })
     var input = element('input', {
       class: 'form-control',
@@ -336,13 +403,6 @@
 
     form.appendChild(input)
     form.appendChild(send)
-
-    var notice = element('p', { class: 'small mb-0 mt-1' })
-
-    host.appendChild(status)
-    host.appendChild(list)
-    host.appendChild(form)
-    host.appendChild(notice)
 
     form.addEventListener('submit', function (event) {
       event.preventDefault()
@@ -361,8 +421,16 @@
       input.value = ''
     })
 
-    loadBlocks()
-    openSocket(list, status, notice)
+    return form
+  }
+
+  function loginPrompt() {
+    var row = element('div', { class: 'd-flex align-items-center gap-2' })
+
+    row.appendChild(element('p', { class: 'text-muted mb-0', text: 'Log in to post a message.' }))
+    row.appendChild(element('a', { class: 'btn btn-primary btn-sm', href: loginUrl(), text: 'Log in' }))
+
+    return row
   }
 
   async function loadBlocks() {
@@ -374,35 +442,45 @@
     }
   }
 
+  /**
+   * Opens the room. The token is optional: without one the API attaches the
+   * socket as a guest, which may read but not write.
+   */
   async function openSocket(list, status, notice) {
-    var token = await idToken()
+    var token = session ? await idToken() : null
+    var attemptedWithToken = Boolean(token)
 
-    if (!token) {
-      status.textContent = 'Your session has ended. Please log in again.'
-      return
-    }
+    var url = config.chat_ws_url + '?videoId=' + encodeURIComponent(videoId)
+    if (token) url += '&Authorization=' + encodeURIComponent(token)
 
-    var url =
-      config.chat_ws_url +
-      '?videoId=' +
-      encodeURIComponent(videoId) +
-      '&Authorization=' +
-      encodeURIComponent(token)
+    var opened = false
 
     socket = new WebSocket(url)
 
     socket.addEventListener('open', function () {
+      opened = true
       reconnectAttempts = 0
-      status.textContent = 'You are in the room as ' + userName() + '.'
+
+      if (!session) status.textContent = 'You are watching as a guest. Log in to post.'
+
       post({ action: 'recent' })
     })
 
     socket.addEventListener('message', function (event) {
-      handleFrame(event.data, list, notice)
+      handleFrame(event.data, list, status, notice)
     })
 
     socket.addEventListener('close', function () {
       socket = null
+
+      if (attemptedWithToken && !opened) {
+        // The API refused the token, so the session is no longer usable.
+        // Retrying with it would loop forever: come back as a guest instead.
+        forgetSession()
+        renderAccount()
+        renderChat()
+        return
+      }
 
       if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
         status.textContent = 'The chat connection was lost. Reload the page to rejoin.'
@@ -427,7 +505,7 @@
     return true
   }
 
-  function handleFrame(raw, list, notice) {
+  function handleFrame(raw, list, status, notice) {
     var frame
 
     try {
@@ -440,17 +518,28 @@
       case 'recent':
         list.textContent = ''
         messageNodes = {}
+
+        // The room states the user id this connection is known by, so the
+        // browser never has to trust its own copy of the session. It is empty
+        // for a guest, which is what makes nothing look like their own.
+        ownUserId = frame.user_id || ''
+
         ;(frame.messages || []).forEach(function (message) {
-          appendMessage(list, message, frame.user_id)
+          appendMessage(list, message, notice)
         })
         if (!list.hasChildNodes()) {
           list.appendChild(
             element('p', { class: 'vh-empty text-muted small mb-0', text: 'No messages yet. Say hello.' }),
           )
         }
+        // The name this connection writes under is the generated nickname,
+        // never anything taken from the account.
+        if (session && frame.nickname) {
+          status.textContent = 'You are in the room as ' + frame.nickname + '.'
+        }
         break
       case 'message':
-        appendMessage(list, frame.message, session.user.id)
+        appendMessage(list, frame.message, notice)
         list.scrollTop = list.scrollHeight
         break
       case 'deleted':
@@ -465,7 +554,7 @@
     }
   }
 
-  function appendMessage(list, message, ownUserId) {
+  function appendMessage(list, message, notice) {
     // Messages from a blocked account are simply not drawn. Blocking is about
     // what the reader sees, and it is stored server side so it travels.
     if (blocked.indexOf(message.user_id) !== -1) return
@@ -474,7 +563,7 @@
     var empty = list.querySelector('.vh-empty')
     if (empty) empty.remove()
 
-    var mine = message.user_id === ownUserId
+    var mine = ownUserId !== '' && message.user_id === ownUserId
     var row = element('div', { class: 'mb-2' })
     row.dataset.messageId = message.id
     row.dataset.userId = message.user_id
@@ -487,39 +576,45 @@
 
     row.appendChild(header)
 
-    var actions = element('div', { class: 'd-flex justify-content-end gap-1' })
+    // A guest reads everything and acts on nothing: deleting, reporting and
+    // blocking all belong to an account.
+    if (session) {
+      var actions = element('div', { class: 'd-flex justify-content-end gap-1' })
 
-    if (mine) {
-      var remove = element('button', { class: 'btn btn-sm btn-link text-danger p-0', type: 'button', text: 'Delete' })
-      remove.addEventListener('click', function () {
-        post({ action: 'delete', message_id: message.id })
-      })
-      actions.appendChild(remove)
+      if (mine) {
+        var remove = element('button', { class: 'btn btn-sm btn-link text-danger p-0', type: 'button', text: 'Delete' })
+        remove.addEventListener('click', function () {
+          post({ action: 'delete', message_id: message.id })
+        })
+        actions.appendChild(remove)
+      } else {
+        var report = element('button', { class: 'btn btn-sm btn-link p-0', type: 'button', text: 'Report' })
+        report.addEventListener('click', function () {
+          post({ action: 'report', message_id: message.id })
+          report.textContent = 'Reported'
+          report.disabled = true
+        })
+
+        var block = element('button', { class: 'btn btn-sm btn-link text-danger p-0', type: 'button', text: 'Block' })
+        block.addEventListener('click', async function () {
+          try {
+            await api('/me/blocks', { method: 'POST', body: JSON.stringify({ user_id: message.user_id }) })
+            blocked.push(message.user_id)
+            hideAuthor(message.user_id)
+          } catch (error) {
+            notice.textContent = 'We could not block that account. Please try again.'
+          }
+        })
+
+        actions.appendChild(report)
+        actions.appendChild(block)
+      }
+
+      row.appendChild(body)
+      row.appendChild(actions)
     } else {
-      var report = element('button', { class: 'btn btn-sm btn-link p-0', type: 'button', text: 'Report' })
-      report.addEventListener('click', function () {
-        post({ action: 'report', message_id: message.id })
-        report.textContent = 'Reported'
-        report.disabled = true
-      })
-
-      var block = element('button', { class: 'btn btn-sm btn-link text-danger p-0', type: 'button', text: 'Block' })
-      block.addEventListener('click', async function () {
-        try {
-          await api('/me/blocks', { method: 'POST', body: JSON.stringify({ user_id: message.user_id }) })
-          blocked.push(message.user_id)
-          hideAuthor(message.user_id)
-        } catch (error) {
-          notice.textContent = 'We could not block that account. Please try again.'
-        }
-      })
-
-      actions.appendChild(report)
-      actions.appendChild(block)
+      row.appendChild(body)
     }
-
-    row.appendChild(body)
-    row.appendChild(actions)
 
     list.appendChild(row)
     messageNodes[message.id] = row
