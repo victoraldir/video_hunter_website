@@ -473,6 +473,13 @@
       panel.setAttribute('aria-hidden', open ? 'false' : 'true')
       launcher.setAttribute('aria-expanded', String(open))
 
+      // The launcher sits over the panel otherwise: on a phone the panel is
+      // the whole screen, and on a wide screen both hug the same corner, so
+      // the button would cover the composer's send button. Hiding it doubles
+      // as the minimize affordance: the way out is the chevron in the header.
+      launcher.style.display = open ? 'none' : ''
+      launcher.setAttribute('aria-hidden', open ? 'true' : 'false')
+
       if (!open) return
 
       launcher.classList.remove('vh-has-unread')
