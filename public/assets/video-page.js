@@ -37,6 +37,8 @@
   var chatOpen = false
   /** Set by renderChat, so the Escape key can close the current panel. */
   var setChatOpen = null
+  /** Set by renderChat, so an arriving message can badge the launcher. */
+  var launcher = null
 
   start()
 
@@ -358,11 +360,15 @@
   // ---------------------------------------------------------------------------
 
   /**
-   * Draws the room as a panel hanging off a button in the corner, rather than
-   * as a section in the flow of the page. The flow on a video page belongs to
-   * the download buttons and the ad units, and a chat sitting below both of
-   * them is one nobody scrolls far enough to find. Nothing here moves the ads,
-   * which is what the page is paid on.
+   * Draws the room as a panel that opens from a floating launcher button,
+   * rather than as a section in the flow of the page. The flow on a video
+   * page belongs to the download buttons and the ad units, and a chat sitting
+   * below both of them is one nobody scrolls far enough to find. Nothing here
+   * moves the ads, which is what the page is paid on.
+   *
+   * On a wide screen the panel is a sidebar pinned to the right edge; on a
+   * phone it takes the whole screen. Minimizing collapses it back to the
+   * launcher, and the socket stays open underneath either way.
    *
    * Everyone gets to read the room; the composer only appears for a signed in
    * visitor, and a guest gets the login prompt in its place.
@@ -378,47 +384,60 @@
     session = readSession()
 
     host.textContent = ''
+    setChatOpen = null
+
+    injectChatStyles()
 
     var status = element('p', { class: 'small text-muted mb-2' })
     status.textContent = session ? 'Connecting…' : 'Everyone can read this room. Log in to join in.'
 
-    var list = element('div', {
-      class: 'border rounded p-2 mb-2',
-      style: 'flex: 1 1 auto; min-height: 9rem; overflow-y: auto; background: #fff',
-    })
+    var list = element('div', { class: 'vh-chat-list p-2 mb-2 bg-white border rounded' })
 
     var notice = element('p', { class: 'small mb-0 mt-1' })
 
     var header = element('div', { class: 'd-flex align-items-center justify-content-between mb-2' })
-    header.appendChild(element('h2', { class: 'h6 mb-0', text: 'Chat about this video' }))
+    header.appendChild(element('h2', { class: 'h6 mb-0 text-truncate', text: 'Chat about this video' }))
 
-    var close = element('button', {
+    // Minimize, not a bare close: the room stays connected and collapses to
+    // the launcher, which matches the way the panel comes back.
+    var controls = element('div', { class: 'd-flex align-items-center' })
+
+    var minimize = element('button', {
       class: 'btn btn-sm btn-link text-muted p-0 text-decoration-none',
       type: 'button',
-      'aria-label': 'Close the chat',
-      text: '\u2715',
+      'aria-label': 'Minimize the chat',
     })
-    header.appendChild(close)
+    minimize.appendChild(minimizeIcon())
+    controls.appendChild(minimize)
+
+    // On a phone the panel covers the whole page, so a second, quieter way out
+    // beyond the system edge does more harm than a plain minimize does.
+    if (!isMobileViewport()) {
+      var close = element('button', {
+        class: 'btn btn-sm btn-link text-muted p-0 text-decoration-none ms-2',
+        type: 'button',
+        'aria-label': 'Close the chat',
+      })
+      close.appendChild(chatCloseIcon())
+      controls.appendChild(close)
+      close.addEventListener('click', function () {
+        setOpen(false)
+        launcher.focus()
+      })
+    }
+    header.appendChild(controls)
 
     var panel = element('div', {
       id: 'vh-chat-panel',
+      class: 'vh-chat-panel' + (chatOpen ? ' vh-chat-open' : ''),
       role: 'dialog',
       'aria-label': 'Chat about this video',
-      // Fixed, so the panel cannot push the download buttons or the ads around,
-      // and so it stays within reach wherever the reader has scrolled to. The
-      // z-index is below the 1050 of the download overlay, so that overlay still
-      // covers the chat while a download is being prepared.
-      style:
-        'position: fixed; right: 16px; bottom: 88px; z-index: 1040;' +
-        ' width: min(360px, calc(100vw - 32px)); max-height: min(70vh, 520px);' +
-        ' display: flex; flex-direction: column; background: #fff;' +
-        ' border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 0.75rem;' +
-        ' box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2)',
+      // The `vh-chat-open` class toggles the panel instead of inline display
+      // values: all the responsive geometry lives in the stylesheet, and the
+      // z-index stays below the 1050 of the download overlay, so that overlay
+      // still covers the chat while a download is being prepared.
     })
-    // Display is set directly rather than through the `hidden` attribute: the
-    // panel carries an inline `display: flex`, which outranks the `[hidden]`
-    // rule unless Bootstrap's reboot marks it important.
-    panel.style.display = chatOpen ? 'flex' : 'none'
+    panel.setAttribute('aria-hidden', chatOpen ? 'false' : 'true')
 
     panel.appendChild(header)
     panel.appendChild(status)
@@ -433,18 +452,16 @@
 
     panel.appendChild(notice)
 
-    var launcher = element('button', {
-      class: 'btn btn-primary rounded-circle shadow',
+    launcher = element('button', {
+      class: 'vh-chat-launcher btn btn-primary rounded-circle shadow',
       type: 'button',
+      id: 'vh-chat-launcher',
       'aria-controls': 'vh-chat-panel',
       'aria-expanded': String(chatOpen),
       'aria-label': 'Open the chat about this video',
-      style:
-        'position: fixed; right: 16px; bottom: 16px; z-index: 1040;' +
-        ' width: 3.5rem; height: 3.5rem;' +
-        ' display: flex; align-items: center; justify-content: center',
     })
     launcher.appendChild(chatIcon())
+    launcher.appendChild(element('span', { class: 'vh-chat-badge', 'aria-hidden': 'true' }))
 
     host.appendChild(panel)
     host.appendChild(launcher)
@@ -452,11 +469,13 @@
     /** Opens or closes the panel, keeping the button and the keyboard in step. */
     function setOpen(open) {
       chatOpen = open
-      panel.style.display = open ? 'flex' : 'none'
+      panel.classList.toggle('vh-chat-open', open)
+      panel.setAttribute('aria-hidden', open ? 'false' : 'true')
       launcher.setAttribute('aria-expanded', String(open))
 
       if (!open) return
 
+      launcher.classList.remove('vh-has-unread')
       list.scrollTop = list.scrollHeight
 
       var input = panel.querySelector('input')
@@ -466,7 +485,7 @@
     // This render is now the one the Escape key and the buttons drive.
     setChatOpen = setOpen
 
-    close.addEventListener('click', function () {
+    minimize.addEventListener('click', function () {
       setOpen(false)
       launcher.focus()
     })
@@ -476,6 +495,70 @@
     })
 
     openSocket(list, status, notice)
+  }
+
+  /**
+   * The styles cannot sit on the page: the video pages are built by the API
+   * and this markup is drawn in the browser, so the classes ride along with
+   * the script. One style block, injected once, covers narrow and wide
+   * screens.
+   */
+  function injectChatStyles() {
+    if (document.getElementById('vh-chat-styles')) return
+
+    var css = [
+      // The launcher: a round chat bubble pinned to the corner. It sits above
+      // the page but below the download overlay (z-index 1050 above), and the
+      // badge lights up while the panel is minimized and something new turns
+      // up in the room.
+      '.vh-chat-launcher {',
+      '  position: fixed; right: 1rem; bottom: 1rem; z-index: 1040;',
+      '  width: 3.5rem; height: 3.5rem; display: flex;',
+      '  align-items: center; justify-content: center;',
+      '}',
+      '.vh-chat-launcher .vh-chat-badge {',
+      '  display: none; position: absolute; top: 0; right: 0;',
+      '  width: 0.85rem; height: 0.85rem; border-radius: 50%;',
+      '  background: #ffc107; border: 2px solid #fff;',
+      '}',
+      '.vh-chat-launcher.vh-has-unread .vh-chat-badge { display: block; }',
+
+      // The panel: full screen by default (phones), a right edge sidebar on
+      // wide screens, only rounding the top-left corner so it reads as part
+      // of the page frame instead of a floating card. The launcher stays
+      // underneath, which is what makes minimizing feel like collapsing.
+      '.vh-chat-panel {',
+      '  position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 1040;',
+      '  display: none; flex-direction: column;',
+      '  background: #fff; padding: 0.75rem; overflow: hidden;',
+      '}',
+      '.vh-chat-panel.vh-chat-open { display: flex; }',
+      '.vh-chat-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }',
+
+      // Wide screens: pin to the right edge, tall enough to feel like a room
+      // rather than a tooltip.
+      '@media (min-width: 576px) {',
+      '  .vh-chat-panel {',
+      '    top: auto; left: auto;',
+      '    width: min(380px, 90vw);',
+      '    height: min(85vh, 640px);',
+      '    border: 1px solid #dee2e6; border-right: 0; border-bottom: 0;',
+      '    border-radius: 0.75rem 0 0 0;',
+      '    box-shadow: -0.5rem 0 1.5rem rgba(0, 0, 0, 0.15);',
+      '  }',
+      '}',
+    ].join('\n')
+
+    var style = document.createElement('style')
+    style.id = 'vh-chat-styles'
+    style.textContent = css
+    document.head.appendChild(style)
+  }
+
+  /** A phone is not a width test here: it is whether the panel would swallow
+   * the whole viewport. The same 576px Bootstrap uses for its own tiers. */
+  function isMobileViewport() {
+    return window.matchMedia('(max-width: 575.98px)').matches
   }
 
   function composer(notice) {
@@ -528,19 +611,35 @@
    * rest of the site gets from that set.
    */
   function chatIcon() {
+    return svgIcon(22, [
+      'M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2',
+      'm2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9 9 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.4 10.4 0 0 1-.524 2.318l-.003.011a11 11 0 0 1-.244.637c-.079.186.074.394.273.362a22 22 0 0 0 .693-.125m.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6-3.004 6-7 6a8 8 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a11 11 0 0 0 .398-2',
+    ])
+  }
+
+  /** Bootstrap Icons' chevron-down, on the header's minimize button. */
+  function minimizeIcon() {
+    return svgIcon(16, [
+      'M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708',
+    ])
+  }
+
+  /** Bootstrap Icons' x-lg, the quieter close on wide screens. */
+  function chatCloseIcon() {
+    return svgIcon(16, [
+      'M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z',
+    ])
+  }
+
+  function svgIcon(size, paths) {
     var ns = 'http://www.w3.org/2000/svg'
     var svg = document.createElementNS(ns, 'svg')
 
     svg.setAttribute('viewBox', '0 0 16 16')
-    svg.setAttribute('width', '22')
-    svg.setAttribute('height', '22')
+    svg.setAttribute('width', String(size))
+    svg.setAttribute('height', String(size))
     svg.setAttribute('fill', 'currentColor')
     svg.setAttribute('aria-hidden', 'true')
-
-    var paths = [
-      'M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2',
-      'm2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9 9 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.4 10.4 0 0 1-.524 2.318l-.003.011a11 11 0 0 1-.244.637c-.079.186.074.394.273.362a22 22 0 0 0 .693-.125m.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6-3.004 6-7 6a8 8 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a11 11 0 0 0 .398-2',
-    ]
 
     paths.forEach(function (d) {
       var path = document.createElementNS(ns, 'path')
@@ -659,6 +758,10 @@
       case 'message':
         appendMessage(list, frame.message, notice)
         list.scrollTop = list.scrollHeight
+
+        // A message that lands while the room is minimized lights the badge on
+        // the launcher; opening the chat clears it.
+        if (!chatOpen && launcher) launcher.classList.add('vh-has-unread')
         break
       case 'deleted':
         removeNode(frame.message_id)
