@@ -361,9 +361,14 @@ export const en: Dictionary = {
         answer: 'Yes. Send the video link to @MyVideoHunterBot on Telegram and the bot replies with a download link.',
       },
       {
-        question: 'I am not able to save files to my iPhone or iPad. What should I do?',
+        question: 'How do I save or share a video on iPhone or iPad?',
         answer:
-          'iOS Safari often opens the video in a player instead of saving it. Tap and hold the download button and choose Download Linked File, or use a file manager such as Documents by Readdle to save the video to your device.',
+          'The download buttons on the video page open the video in the iOS player, and its Share button saves the video to Photos or shares it to any app in one tap. Prefer a file? Use the "Save to Files" link under the buttons and the video is saved to the Downloads folder of the Files app.',
+      },
+      {
+        question: "Why does nothing happen when I tap download inside the X (Twitter) app?",
+        answer:
+          'X, Instagram, Facebook, TikTok and Telegram open links in their own in-app browsers, and those browsers block file downloads, so the tap is ignored. Open this site in Safari or Chrome and download there: when a video page is opened inside an app it shows a notice with a button to copy the page link.',
       },
       {
         question: 'What should I do if the video plays instead of downloading?',

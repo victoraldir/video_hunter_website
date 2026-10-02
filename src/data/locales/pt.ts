@@ -361,9 +361,14 @@ export const pt: Dictionary = {
         answer: 'Sim. Envie o link do vídeo para @MyVideoHunterBot no Telegram e o bot responde com um link de download.',
       },
       {
-        question: 'Não consigo salvar arquivos no meu iPhone ou iPad. O que devo fazer?',
+        question: 'Como salvo ou compartilho um vídeo no iPhone ou iPad?',
         answer:
-          'O Safari do iOS costuma abrir o vídeo em um player em vez de salvá-lo. Toque e segure o botão de download e escolha Baixar arquivo vinculado, ou use um gerenciador de arquivos como o Documents by Readdle para salvar o vídeo no seu dispositivo.',
+          'Os botões de download da página de vídeo abrem o vídeo no player do iOS, e o botão Compartilhar dele salva o vídeo em Fotos ou o envia para qualquer app em um toque. Prefere um arquivo? Use o link "Salvar em Arquivos" abaixo dos botões e o vídeo é salvo na pasta Downloads do app Arquivos.',
+      },
+      {
+        question: 'Por que nada acontece quando toco em baixar dentro do app do X (Twitter)?',
+        answer:
+          'X, Instagram, Facebook, TikTok e Telegram abrem links nos seus próprios navegadores integrados, e esses navegadores bloqueiam downloads de arquivos, então o toque é ignorado. Abra este site no Safari ou Chrome e baixe de lá: quando uma página de vídeo é aberta dentro de um app, ela mostra um aviso com um botão para copiar o link da página.',
       },
       {
         question: 'O que devo fazer se o vídeo for reproduzido em vez de baixado?',
