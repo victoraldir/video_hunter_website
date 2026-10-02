@@ -403,7 +403,7 @@ export const es: Dictionary = {
       {
         question: '¿Cómo guardo o comparto un video en iPhone o iPad?',
         answer:
-          'Los botones de descarga de la página de video abren el video en el reproductor de iOS, y su botón de Compartir guarda el video en Fotos o lo comparte a cualquier app en un solo toque. ¿Prefieres un archivo? Usa el enlace "Guardar en Archivos" bajo los botones y el video se guarda en la carpeta Descargas de la app Archivos.',
+          'Al tocar un botón de descarga, el video se guarda en la carpeta Descargas de la app Archivos. Para compartirlo, abre la app Archivos, busca el video en Descargas y usa el botón de compartir desde ahí.',
       },
       {
         question: '¿Por qué no pasa nada al tocar descargar dentro de la app de X (Twitter)?',

@@ -363,7 +363,7 @@ export const pt: Dictionary = {
       {
         question: 'Como salvo ou compartilho um vídeo no iPhone ou iPad?',
         answer:
-          'Os botões de download da página de vídeo abrem o vídeo no player do iOS, e o botão Compartilhar dele salva o vídeo em Fotos ou o envia para qualquer app em um toque. Prefere um arquivo? Use o link "Salvar em Arquivos" abaixo dos botões e o vídeo é salvo na pasta Downloads do app Arquivos.',
+          'Ao tocar em um botão de download, o vídeo é salvo na pasta Downloads do app Arquivos. Para compartilhá-lo, abra o app Arquivos, localize o vídeo em Downloads e use o botão de compartilhar ali.',
       },
       {
         question: 'Por que nada acontece quando toco em baixar dentro do app do X (Twitter)?',

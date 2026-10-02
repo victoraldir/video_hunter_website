@@ -363,7 +363,7 @@ export const en: Dictionary = {
       {
         question: 'How do I save or share a video on iPhone or iPad?',
         answer:
-          'The download buttons on the video page open the video in the iOS player, and its Share button saves the video to Photos or shares it to any app in one tap. Prefer a file? Use the "Save to Files" link under the buttons and the video is saved to the Downloads folder of the Files app.',
+          'Tapping a download button saves the video to the Downloads folder of the Files app. To share it, open the Files app, find the video in Downloads and use the share button from there.',
       },
       {
         question: "Why does nothing happen when I tap download inside the X (Twitter) app?",
