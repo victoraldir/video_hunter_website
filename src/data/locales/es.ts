@@ -401,9 +401,14 @@ export const es: Dictionary = {
           'Sí. Envía el enlace del video a @MyVideoHunterBot en Telegram y el bot responde con un enlace de descarga.',
       },
       {
-        question: 'No puedo guardar archivos en mi iPhone o iPad. ¿Qué debería hacer?',
+        question: '¿Cómo guardo o comparto un video en iPhone o iPad?',
         answer:
-          'Safari en iOS a menudo abre el video en un reproductor en lugar de guardarlo. Mantén presionado el botón de descarga y elige Descargar archivo enlazado, o usa un gestor de archivos como Documents by Readdle para guardar el video en tu dispositivo.',
+          'Los botones de descarga de la página de video abren el video en el reproductor de iOS, y su botón de Compartir guarda el video en Fotos o lo comparte a cualquier app en un solo toque. ¿Prefieres un archivo? Usa el enlace "Guardar en Archivos" bajo los botones y el video se guarda en la carpeta Descargas de la app Archivos.',
+      },
+      {
+        question: '¿Por qué no pasa nada al tocar descargar dentro de la app de X (Twitter)?',
+        answer:
+          'X, Instagram, Facebook, TikTok y Telegram abren los enlaces en sus propios navegadores integrados, y esos navegadores bloquean las descargas de archivos, por lo que el toque se ignora. Abre este sitio en Safari o Chrome y descarga desde ahí: cuando una página de video se abre dentro de una app, muestra un aviso con un botón para copiar el enlace de la página.',
       },
       {
         question: '¿Qué hago si el video se reproduce en lugar de descargarse?',
