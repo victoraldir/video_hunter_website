@@ -1,4 +1,4 @@
-const CACHE_NAME = 'video-hunter-cache-v4';
+const CACHE_NAME = 'video-hunter-cache-v5';
 const CDN = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist';
 
 const urlsToCache = [
@@ -54,11 +54,15 @@ self.addEventListener('fetch', (event) => {
 
   // HTML is network-first so a deploy is visible immediately, falling back to
   // the cache when offline. The prerendered pages are the whole point of the
-  // site, so they must never be served stale.
+  // site, so they must never be served stale. Scripts are network-first too:
+  // the video page chat lives in /assets/video-page.js, and serving an old
+  // version of that file under stale-while-revalidate left a visitor stuck on
+  // a broken UI for a whole extra visit before the background refresh landed.
   const isDocument =
     request.mode === 'navigate' || (request.headers.get('accept') || '').includes('text/html');
+  const isScript = request.destination === 'script';
 
-  if (isDocument) {
+  if (isDocument || isScript) {
     event.respondWith(
       fetch(request)
         .then((response) => {
